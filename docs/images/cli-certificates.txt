@@ -1,0 +1,7 @@
+$ certlord list
+12a45b78  www.example.org  deployed
+34c56d90  api.example.org  generated
+56e78f12  shop.example.org  processing
+
+$ certlord show www.example.org
+12a45b78-1234-4234-8234-123456789abc  www.example.org  deployed

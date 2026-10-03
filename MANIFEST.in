@@ -20,3 +20,6 @@ include docs/vault-approle.md
 recursive-include assets/brand *.svg *.png *.ico *.webmanifest *.md
 include scripts/build_brand_assets.py
 include docs/release-notes.md
+include docs/screenshots.md docs/rc-evaluation.md
+recursive-include docs/images *.png *.txt *.json
+include scripts/capture_docs.py scripts/requirements-docs.txt

@@ -1,0 +1,7 @@
+{
+  "data": "synthetic read-only HTTP fixture; not lifecycle evidence",
+  "version": "1.0.0rc1",
+  "dwho": "0.3.63",
+  "columns": 100,
+  "rows": 12
+}

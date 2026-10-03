@@ -11,12 +11,25 @@ TLS certificate lifecycle automation.
 
 Version: **1.0.0rc1 — release candidate**. See the [release notes](docs/release-notes.md).
 
-CertLord coordinates certificate creation and renewal through Certbot, external
-PEM import and version-checked replacement, Redis-backed HTTP challenges, Vault
-storage and deployment through Auton. Optional destination TLS verification checks
+CertLord automates TLS certificate issuance, renewal and deployment. It supports
+ACME through Certbot and importing existing PEM certificates, stores certificates
+in Vault and deploys them through Auton. Optional destination TLS verification checks
 the certificate actually served before acknowledgement. StatusCake/Updown adapters
 are optional; expiry observations are exposed for an external supervision system.
 It uses DWho, HTTPdis and Sonicprobe.
+
+Redis stores temporary ACME HTTP-01 challenge responses and tracks pending work,
+retries and deployment leases. Vault stores certificate material. Both services
+must be provisioned separately; see the [architecture](docs/architecture.md).
+
+## Command line and terminal interface
+
+Use ordinary commands in scripts, or explicitly open the read-only terminal browser
+with `certlord tui`. [View the illustrated guide](docs/screenshots.md).
+
+![CertLord terminal inventory with demonstration certificates](docs/images/tui-inventory.png)
+
+Real client capture with synthetic demonstration data; this is not deployment evidence.
 
 ## Names and installation
 
@@ -37,6 +50,8 @@ See [MIGRATION.md](MIGRATION.md) before updating an existing installation.
 
 ## Project documentation
 
+- [CLI and TUI screenshots](docs/screenshots.md)
+- [Evaluate the release candidate](docs/rc-evaluation.md)
 - [Certificate UUIDs, HTTP API, CLI and TUI](docs/certificate-identity.md)
 - [Architecture and behavior](docs/architecture.md)
 - [Component contracts and compatibility](docs/components.md)

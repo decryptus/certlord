@@ -21,6 +21,8 @@ setup_cfg = yaml.safe_load(read_project_file('setup.yml'))
 long_desc = read_project_file('README.md')
 public_base = setup_cfg['url'] + '/blob/v' + setup_cfg['version'] + '/'
 raw_base = setup_cfg['url'].replace('https://github.com/', 'https://raw.githubusercontent.com/') + '/v' + setup_cfg['version'] + '/'
+long_desc = re.sub(r'(!\[[^\]]*\])\((?![a-zA-Z][a-zA-Z0-9+.-]*:|#)([^)]+)\)',
+                   lambda match: match.group(1) + '(' + raw_base + match.group(2) + ')', long_desc)
 long_desc = re.sub(r'\]\((?![a-zA-Z][a-zA-Z0-9+.-]*:|#)([^)]+)\)',
                    lambda match: '](' + public_base + match.group(1) + ')', long_desc)
 long_desc = re.sub(r'(src|srcset)="(assets/[^" ]+)"',
