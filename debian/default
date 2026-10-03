@@ -1,0 +1,3 @@
+# Configure credentials and /etc/certlord/certlord.yml before enabling the service.
+CERTLORD_ENABLE="no"
+EXTRA_OPTS=""

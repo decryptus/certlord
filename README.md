@@ -70,7 +70,7 @@ python -m build
 Build dependencies (including PyYAML, needed to read `setup.yml`) are declared
 in `pyproject.toml`. Direct dependency floors match the tested baseline in `constraints-minimum.txt`.
 CI exercises both that baseline and the latest resolvable dependencies.
-No automatic package publication is configured.
+Versioned releases publish to PyPI after the test, lifecycle and package checks.
 Debian packaging targets Debian 12 / Python 3.11 on amd64. See the
 [installation guide](docs/debian-installation.md) and validation instructions in
 [testing](docs/testing.md). Installed-unit start/stop/restart is checked under

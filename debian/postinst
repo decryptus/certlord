@@ -1,0 +1,21 @@
+#!/bin/sh
+set -e
+
+case "$1" in
+    configure)
+        if ! getent group certlord >/dev/null; then
+            addgroup --system certlord
+        fi
+        if ! getent passwd certlord >/dev/null; then
+            adduser --system --ingroup certlord --home /var/lib/certlord \
+                --no-create-home --gecos certlord --disabled-login certlord
+        fi
+        install -d -o certlord -g certlord -m 0750 /var/lib/certlord /var/log/certlord
+        install -d -o root -g certlord -m 0750 /etc/certlord
+        ;;
+    abort-upgrade|abort-remove|abort-deconfigure) ;;
+    *) echo "postinst called with unknown argument '$1'" >&2; exit 1 ;;
+esac
+
+#DEBHELPER#
+exit 0

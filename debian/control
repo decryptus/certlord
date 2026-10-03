@@ -1,0 +1,15 @@
+Source: certlord
+Section: net
+Priority: optional
+Maintainer: Adrien Delle Cave <pypi@doowan.net>
+Build-Depends: debhelper (>= 13), dh-virtualenv (>= 1.2), python3 (>= 3.11), python3-venv, python3-dev, python3-setuptools, python3-yaml, libcurl4-openssl-dev, libssl-dev
+Standards-Version: 4.6.2
+Rules-Requires-Root: no
+Homepage: https://github.com/decryptus/certlord
+
+Package: certlord
+Architecture: any
+Depends: ${misc:Depends}, python3 (>= 3.11), python3 (<< 3.12), adduser, ca-certificates, libc6, libcurl4, libssl3, libmagic1
+Description: TLS certificate lifecycle automation
+ Coordinates ACME issuance, Vault certificate storage, deployment and monitoring.
+ Ships a private Python environment built for Debian 12.

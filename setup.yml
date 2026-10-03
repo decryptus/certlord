@@ -1,0 +1,24 @@
+---
+name: certlord
+description: TLS certificate lifecycle automation
+author: Adrien Delle Cave
+author_email: pypi@doowan.net
+copyright: '2024 fjord-technologies'
+release: '1.0.0rc1'
+version: '1.0.0rc1'
+license: License GPL-3
+url: https://github.com/decryptus/certlord
+python_requires:
+  - '>=3.11'
+classifiers:
+  - 'Development Status :: 4 - Beta'
+  - 'License :: OSI Approved :: GNU General Public License v3 (GPLv3)'
+  - 'Natural Language :: English'
+  - 'Operating System :: Unix'
+  - 'Programming Language :: Python'
+  - 'Programming Language :: Python :: 3'
+  - 'Programming Language :: Python :: 3.11'
+  - 'Programming Language :: Python :: 3.12'
+  - 'Topic :: System :: Monitoring'
+  - 'Topic :: Utilities'
+

@@ -1,0 +1,9 @@
+certlord (1.0.0~rc1) UNRELEASED; urgency=medium
+
+  * Prepare the first public release candidate, Python version 1.0.0rc1.
+  * ACME issuance/renewal and external PEM import/versioned replacement.
+  * Vault KV v2 storage, authenticated HTTP API, CLI and explicit TUI.
+  * Auton deployment, optional remote receipts and served TLS verification.
+  * Operational observations, bounded shutdown and recovery checks.
+
+ -- Adrien Delle Cave <pypi@doowan.net>  Sat, 03 Oct 2026 00:45:00 +0000

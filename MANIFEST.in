@@ -1,0 +1,22 @@
+include README.md MIGRATION.md CHANGELOG VERSION RELEASE LICENSE
+include requirements.txt constraints-minimum.txt setup.yml setup.yml.j2
+include CONTRIBUTING.md AGENTS.md
+recursive-include tests *.py *.yml *.Dockerfile *.service
+recursive-include etc *
+recursive-include debian *
+recursive-include .github *.py *.sh *.yml
+include docs/acme-connector.md
+include docs/architecture.md
+include docs/certificate-identity.md
+include docs/certificate-import.md
+include docs/components.md
+include docs/debian-installation.md
+include docs/operation-correlation.md
+include docs/operations.md
+include docs/supervision.md
+include docs/testing.md
+include docs/tls-verification.md
+include docs/vault-approle.md
+recursive-include assets/brand *.svg *.png *.ico *.webmanifest *.md
+include scripts/build_brand_assets.py
+include docs/release-notes.md

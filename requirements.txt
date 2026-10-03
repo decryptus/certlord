@@ -1,0 +1,14 @@
+certbot-httpreq>=0.0.24
+dnspython==1.16.0
+dwho>=0.3.63
+httpdis>=0.6.33
+hvac>=2.4.0
+pycurl>=7.48.0
+pyOpenSSL>=26.1.0
+PyYAML>=6.0.3
+requests>=2.34.2
+six>=1.17.0
+sonicprobe>=0.3.56
+statuscake>=1.4.5
+updownio>=0.1.0
+redis>=4.5.5

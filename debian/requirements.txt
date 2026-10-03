@@ -1,0 +1,4 @@
+-r ../requirements.txt
+auton==1.2.1
+acme-http-connector==0.2.1
+certbot==5.8.0

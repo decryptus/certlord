@@ -1,0 +1,21 @@
+# Same-host example only. Do not expose certificate mutation routes publicly.
+# Install separately as /etc/letsencrypt/certbot-httpreq.yml (mode 0600).
+# Public HTTP-01 GET routing is a separate prerequisite; see docs/acme-connector.md.
+perform:
+  uri: http://127.0.0.1:8666
+  method: PUT
+  format: json
+  timeout: 30
+  verify: true
+cleanup:
+  uri: http://127.0.0.1:8666
+  method: DELETE
+  timeout: 30
+  verify: true
+deploy:
+  uri: http://127.0.0.1:8666
+  path: /api/ssl-certs/save
+  method: POST
+  format: json
+  timeout: 30
+  verify: true

@@ -1,0 +1,19 @@
+[Unit]
+Description=CertLord certificate lifecycle automation
+After=network.target nss-lookup.target
+ConditionPathExists=/etc/certlord/certlord.yml
+
+[Service]
+Type=simple
+RuntimeDirectory=certlord
+Environment="PATH=/opt/venvs/certlord/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
+EnvironmentFile=-/etc/certlord/envfile
+ExecStart=/opt/venvs/certlord/bin/certlord -f -c /etc/certlord/certlord.yml
+Restart=on-failure
+User=certlord
+Group=certlord
+UMask=0077
+TimeoutStopSec=30s
+
+[Install]
+WantedBy=multi-user.target

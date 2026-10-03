@@ -1,0 +1,3 @@
+etc/certlord/*.example etc/certlord/
+etc/certlord/certlord.yml usr/share/doc/certlord/examples/
+VERSION usr/share/certlord/

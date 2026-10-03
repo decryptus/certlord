@@ -1,0 +1,39 @@
+name: lifecycle acceptance
+on:
+  workflow_call:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  lifecycle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - name: Install runtime and pinned external clients
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y redis-server unzip
+          python -m pip install . 'certbot-httpreq==0.0.24' 'acme-http-connector==0.2.1' 'certbot==5.8.0' 'auton==1.2.1' 'autond==1.2.1'
+      - name: Install checksum-verified disposable CA and Vault
+        run: bash .github/scripts/install-lifecycle-tools.sh "$RUNNER_TEMP/certlord-tools"
+      - name: Installed lifecycle, actual served TLS and failure recovery
+        working-directory: ${{ runner.temp }}
+        run: >-
+          python "$GITHUB_WORKSPACE/tests/integration/lifecycle.py" run
+          --tools "$RUNNER_TEMP/certlord-tools" --source "$GITHUB_WORKSPACE"
+          --report "$RUNNER_TEMP/certlord-evidence/report.json"
+      - name: Retain only sanitized test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: certlord-lifecycle-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/certlord-evidence/report.json
+          if-no-files-found: warn
+          retention-days: 7

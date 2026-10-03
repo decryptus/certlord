@@ -1,0 +1,98 @@
+name: Release candidate and PyPI publication
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+  pull_request:
+permissions:
+  contents: read
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  tests:
+    uses: ./.github/workflows/tests.yml
+  lifecycle:
+    uses: ./.github/workflows/lifecycle.yml
+  debian:
+    uses: ./.github/workflows/debian.yml
+  build:
+    needs: [tests, lifecycle, debian]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@a26af69be951a213d495a4c3e4e4022e16d87065
+        with:
+          python-version: '3.12'
+      - run: python -m pip install build twine PyYAML
+      - run: python -m build
+      - run: python -m twine check --strict dist/*
+      - run: python .github/scripts/check-release.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-distributions
+          path: dist/
+          if-no-files-found: error
+  tag:
+    needs: build
+    if: (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') && github.repository == 'decryptus/certlord' && !github.event.repository.private
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      version: ${{ steps.tag.outputs.version }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - id: tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eu
+          version=$(cat VERSION)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          tag="v$version"
+          if existing=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" --jq '.object.sha'); then
+            test "$existing" = "$GITHUB_SHA"
+          else
+            gh api --method POST "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/$tag" -f sha="$GITHUB_SHA"
+          fi
+  publish:
+    needs: [build, tag]
+    if: (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') && github.repository == 'decryptus/certlord' && !github.event.repository.private
+    runs-on: ubuntu-latest
+    environment: pypi
+    permissions:
+      id-token: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-distributions
+          path: dist/
+      - uses: pypa/gh-action-pypi-publish@release/v1
+  github-release:
+    needs: [publish, tag]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: release-distributions
+          path: dist/
+      - name: Publish matching GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: v${{ needs.tag.outputs.version }}
+        run: |
+          set -eu
+          prerelease_flag=''
+          case "$RELEASE_TAG" in *rc*|*a[0-9]*|*b[0-9]*) prerelease_flag='--prerelease';; esac
+          gh release create "$RELEASE_TAG" dist/* --verify-tag --title "CertLord $RELEASE_TAG" --notes-file docs/release-notes.md $prerelease_flag

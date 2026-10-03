@@ -1,0 +1,158 @@
+name: Debian packaging
+on:
+  workflow_call:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  debian12:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    container: debian:12
+    steps:
+      - name: Install build tools
+        run: |
+          apt-get update -qq
+          apt-get install -y --no-install-recommends ca-certificates git build-essential debhelper dh-virtualenv python3 python3-venv python3-dev python3-setuptools python3-yaml libcurl4-openssl-dev libssl-dev
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - name: Build Debian package with isolated dependencies
+        run: |
+          dpkg-buildpackage -us -uc -b
+          mkdir -p deb-artifacts
+          cp ../certlord_*.deb deb-artifacts/
+      - name: Install without network access to package indexes
+        run: |
+          export PIP_NO_INDEX=1
+          export http_proxy=http://127.0.0.1:9
+          export https_proxy=http://127.0.0.1:9
+          dpkg -i ../certlord_*.deb
+          /opt/venvs/certlord/bin/python -X faulthandler -c 'import sys; print(sys.version, flush=True); import pycurl; print("pycurl imported", flush=True); import cryptography; print("cryptography imported", flush=True)'
+          PYTHONFAULTHANDLER=1 /usr/bin/certlord --help
+          /opt/venvs/certlord/bin/python -m pip check
+          /usr/bin/python3 -I -c 'import importlib.util; assert importlib.util.find_spec("certlord") is None'
+          test ! -e /etc/certlord/certlord.yml
+          test ! -e /etc/systemd/system/multi-user.target.wants/certlord.service
+          test ! -e /etc/sudoers.d/90-certlord
+          test "$(stat -c %U /opt/venvs/certlord)" = root
+          test "$(stat -c %U /var/lib/certlord)" = certlord
+      - name: Installed regression suites outside source checkout
+        run: |
+          suite_dir=$(mktemp -d)
+          cp -R tests etc "$suite_dir/"
+          cp .github/scripts/check-test-collection.py "$suite_dir/"
+          cd "$suite_dir"
+          /opt/venvs/certlord/bin/python check-test-collection.py --runner unittest tests tests/contracts
+          /opt/venvs/certlord/bin/python -m unittest discover -s tests -q
+          /opt/venvs/certlord/bin/python -m unittest discover -s tests/contracts -q
+      - name: Reconfigure and remove without deleting local state
+        run: |
+          touch /var/lib/certlord/retained-fixture
+          PIP_NO_INDEX=1 dpkg -i ../certlord_*.deb
+          dpkg --remove certlord
+          test -f /var/lib/certlord/retained-fixture
+          test ! -e /usr/bin/certlord
+      - uses: actions/upload-artifact@v4
+        with:
+          name: certlord-debian12-amd64
+          path: deb-artifacts/*.deb
+          if-no-files-found: error
+          retention-days: 7
+  clean-runtime:
+    needs: debian12
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    container: debian:12
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: certlord-debian12-amd64
+          path: /tmp/certlord-package
+      - name: Install on clean runtime without build dependencies
+        run: |
+          apt-get update -qq
+          apt-get install -y --no-install-recommends /tmp/certlord-package/certlord_*.deb
+          cd /tmp
+          PYTHONFAULTHANDLER=1 /usr/bin/certlord --help
+          /opt/venvs/certlord/bin/certbot --version
+          /opt/venvs/certlord/bin/auton --help
+          /opt/venvs/certlord/bin/python -m pip check
+          /usr/bin/python3 -I -c 'import importlib.util; assert importlib.util.find_spec("certlord") is None'
+          test ! -e /etc/certlord/certlord.yml
+          test ! -e /etc/sudoers.d/90-certlord
+          test ! -e /etc/systemd/system/multi-user.target.wants/certlord.service
+  systemd-runtime:
+    needs: debian12
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/download-artifact@v4
+        with:
+          name: certlord-debian12-amd64
+          path: tests/integration/package
+      - name: Fetch checksum-verified disposable Vault
+        run: |
+          curl --fail --silent --show-error --location --retry 2 --max-time 120 https://releases.hashicorp.com/vault/1.20.4/vault_1.20.4_linux_amd64.zip --output "$RUNNER_TEMP/vault.zip"
+          echo "fc5fb5d01d192f1216b139fb5c6af17e3af742aaeffc289fd861920ec55f2c9c  $RUNNER_TEMP/vault.zip" | sha256sum --check
+          unzip -q "$RUNNER_TEMP/vault.zip" vault -d tests/integration
+      - name: Build disposable systemd acceptance image
+        run: docker build --target service -f tests/integration/systemd.Dockerfile -t certlord-systemd-fixture tests/integration
+      - name: Boot systemd and verify installed service
+        run: |
+          mkdir -p "$RUNNER_TEMP/systemd-evidence"
+          docker run -d --name certlord-systemd --privileged --cgroupns=private --tmpfs /run --tmpfs /run/lock --mount "type=bind,src=$RUNNER_TEMP/systemd-evidence,dst=/evidence" certlord-systemd-fixture
+          timeout 45 bash -c 'until docker exec certlord-systemd systemctl list-units --no-pager >/dev/null 2>&1; do sleep 1; done'
+          docker exec certlord-systemd /opt/venvs/certlord/bin/python /fixture/systemd_acceptance.py
+      - name: Retain sanitized systemd evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: certlord-systemd-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/systemd-evidence/systemd.json
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Remove disposable acceptance container
+        if: always()
+        run: |
+          if docker container inspect certlord-systemd >/dev/null 2>&1; then
+            docker rm -f certlord-systemd
+          fi
+  systemd-lifecycle:
+    needs: debian12
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/download-artifact@v4
+        with:
+          name: certlord-debian12-amd64
+          path: tests/integration/package
+      - name: Prepare checksum-verified disposable tools and examples
+        run: |
+          bash .github/scripts/install-lifecycle-tools.sh "$GITHUB_WORKSPACE/tests/integration/tools"
+          cp tests/integration/tools/vault tests/integration/vault
+          mkdir tests/integration/source
+          cp -R etc tests/integration/source/
+      - name: Build installed-service lifecycle image
+        run: docker build --target lifecycle -f tests/integration/systemd.Dockerfile -t certlord-systemd-lifecycle tests/integration
+      - name: Interrupt actual issuance and deployment through systemctl
+        run: |
+          mkdir -p "$RUNNER_TEMP/systemd-lifecycle-evidence"
+          docker run -d --name certlord-systemd-lifecycle --privileged --cgroupns=private --tmpfs /run --tmpfs /run/lock --mount "type=bind,src=$RUNNER_TEMP/systemd-lifecycle-evidence,dst=/evidence" certlord-systemd-lifecycle
+          timeout 45 bash -c 'until docker exec certlord-systemd-lifecycle systemctl list-units --no-pager >/dev/null 2>&1; do sleep 1; done'
+          docker exec -e CERTLORD_DISPOSABLE_SYSTEMD=1 -e PATH=/opt/venvs/certlord/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin certlord-systemd-lifecycle /opt/venvs/certlord/bin/python /fixture/lifecycle.py run --systemd-scheduler --tools /fixture/tools --source /fixture/source --report /evidence/report.json
+      - name: Retain sanitized systemd lifecycle evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: certlord-systemd-lifecycle-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/systemd-lifecycle-evidence/report.json
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Remove disposable lifecycle container
+        if: always()
+        run: |
+          if docker container inspect certlord-systemd-lifecycle >/dev/null 2>&1; then
+            docker rm -f certlord-systemd-lifecycle
+          fi

@@ -1,0 +1,10 @@
+/var/log/certlord/*.log {
+    daily
+    missingok
+    rotate 7
+    compress
+    delaycompress
+    notifempty
+    copytruncate
+    create 640 root adm
+}

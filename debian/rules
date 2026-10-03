@@ -1,0 +1,25 @@
+#!/usr/bin/make -f
+
+export DH_VIRTUALENV_INSTALL_ROOT=/opt/venvs
+export PIP_DISABLE_PIP_VERSION_CHECK=1
+
+%:
+	dh $@ --with python-virtualenv
+
+override_dh_virtualenv:
+	dh_virtualenv --python /usr/bin/python3 --builtin-venv --requirements debian/requirements.txt --preinstall PyYAML --preinstall wheel
+
+override_dh_strip:
+	dh_strip -Xopt/venvs/
+
+override_dh_dwz:
+	dh_dwz -Xopt/venvs/
+
+override_dh_shlibdeps:
+	dh_shlibdeps -Xopt/venvs/
+
+override_dh_installsystemd:
+	dh_installsystemd --no-enable --no-start
+
+override_dh_installinit:
+	dh_installinit --no-enable --no-start

@@ -1,0 +1,5 @@
+[Unit]
+Description=Disposable private acceptance Vault
+
+[Service]
+ExecStart=/usr/local/bin/vault server -dev -dev-root-token-id=disposable-systemd-test -dev-listen-address=127.0.0.1:8200
