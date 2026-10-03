@@ -2,6 +2,19 @@
 
 These are maintainer requirements.
 
+## Documentation captures
+
+- Capture the actual CLI/TUI output with synthetic data only; never publish host
+  inventories, credentials, private keys or internal acceptance evidence.
+- Regenerate `docs/images` with `scripts/capture_docs.py` when client rendering,
+  command examples or DWho terminal helpers change. Inspect images for clipping,
+  readability and misleading success/error colors before merging.
+- Keep the capture script, its dependency pins, captions and images together.
+  Captures backed by a fixture must be labelled as demonstrations, never as
+  successful issuance, deployment or production acceptance.
+- Run the documentation capture workflow and check distribution inclusion and
+  README/PyPI image links when changing documentation or release packaging.
+
 ## Test discovery and execution
 
 - Verify the actual runner and every discovery root before adding or changing

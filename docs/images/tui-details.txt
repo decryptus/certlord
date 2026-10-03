@@ -1,0 +1,12 @@
+www.example.org
+UUID: 12a45b78-1234-4234-8234-123456789abc
+Status: deployed
+
+
+
+
+
+
+
+
+Up/Down to scroll; q or Escape to return

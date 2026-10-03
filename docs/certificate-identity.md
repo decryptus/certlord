@@ -35,6 +35,8 @@ their contracts. Save still requires a current issuance attempt header.
 
 ## CLI
 
+See the [illustrated CLI and TUI guide](screenshots.md) for captured examples.
+
 The daemon invocation and its flags remain available. Client commands are
 explicit and execute before daemon initialization:
 

@@ -1,0 +1,4 @@
+CertLord | Enter: details | r: refresh | q: quit
+www.example.org  deployed  12a45b78
+api.example.org  generated  34c56d90
+shop.example.org  processing  56e78f12
