@@ -21,6 +21,7 @@ import six
 
 from dwho.modules import * # XXX
 from dwho.config import init_logger, load_conf, make_piddir, make_logdir
+from certlord.configuration_schema import parse_configuration
 from httpdis.ext import httpdis_json
 from sonicprobe.libs import daemonize
 
@@ -125,7 +126,8 @@ def main(options):
     make_logdir(options.logfile, uid, gid)
 
     root_logger = init_logger(options.logfile, SYSLOG_NAME)
-    options     = load_conf(options.conffile, options, load_creds = True, envvar = 'CERTLORD_CONFIG')
+    options     = load_conf(options.conffile, options, parse_conf_func=parse_configuration,
+                            load_creds=True, envvar='CERTLORD_CONFIG')
 
     setattr(options, 'server_version', "%s/%s" % (SYSLOG_NAME, __version__))
     setattr(options, 'sys_version', '')
