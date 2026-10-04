@@ -7,6 +7,7 @@ from httpdis.ext.httpdis_json import HttpReqErrJson
 from httpdis.httpdis import HttpResponse, HttpResponseJson
 from sonicprobe.libs import network, xys
 from certlord.composition import api_access, certificate_runtime
+from certlord.configuration_schema import validate_configuration
 from certlord.modules.route_auth import authenticated_routes
 from certlord.services.api_access import AccessDenied
 from certlord.services.issuance import issuance_header
@@ -25,6 +26,7 @@ class SslCertsModule(DWhoModuleBase):
     MODULE_NAME = 'ssl_certs'
 
     def init(self, config):
+        validate_configuration(config)
         return super(SslCertsModule, self).init(authenticated_routes(config, self.MODULE_NAME))
 
     def safe_init(self, options):

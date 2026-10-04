@@ -98,3 +98,6 @@ Guide: [Certificate observations and supervision](docs/supervision.md).
 [Post-deployment TLS verification](docs/tls-verification.md) checks configured destinations before acknowledgement.
 
 [Operations and recovery](docs/operations.md): health, queues, retries and first-version limits.
+
+See [configuration validation](docs/configuration-validation.md) for YAML schema
+coverage and compatibility.
