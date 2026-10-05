@@ -1,23 +1,35 @@
-CertLord
-========
+certlord user documentation
+===========================
+
+Installation, configuration, operation and troubleshooting.
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 1
+   :caption: User guide
 
-   docs/acme-connector
-   docs/architecture
-   docs/certificate-identity
    docs/certificate-import
-   docs/components
-   docs/configuration-validation
    docs/debian-installation
-   docs/operation-correlation
+   docs/configuration-validation
    docs/operations
-   docs/rc-evaluation
-   docs/release-notes
-   docs/screenshots
-   docs/supervision
-   docs/testing
    docs/tls-verification
    docs/vault-approle
+   docs/acme-connector
+   docs/operation-correlation
+   docs/release-notes
+   docs/certificate-identity
+   docs/supervision
+   docs/screenshots
+   docs/rc-evaluation
    MIGRATION
+
+
+Contributor documentation
+-------------------------
+
+Changing the project? Use the separate :doc:`docs/contributors` guide.
+
+.. toctree::
+   :maxdepth: 1
+   :caption: For contributors
+
+   docs/contributors

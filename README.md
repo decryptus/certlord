@@ -20,7 +20,7 @@ It uses DWho, HTTPdis and Sonicprobe.
 
 Redis stores temporary ACME HTTP-01 challenge responses and tracks pending work,
 retries and deployment leases. Vault stores certificate material. Both services
-must be provisioned separately; see the [architecture](docs/architecture.md).
+must be provisioned separately; see the [installation guide](docs/debian-installation.md).
 
 ## Command line and terminal interface
 
@@ -53,45 +53,13 @@ See [MIGRATION.md](MIGRATION.md) before updating an existing installation.
 - [CLI and TUI screenshots](docs/screenshots.md)
 - [Evaluate the release candidate](docs/rc-evaluation.md)
 - [Certificate UUIDs, HTTP API, CLI and TUI](docs/certificate-identity.md)
-- [Architecture and behavior](docs/architecture.md)
-- [Component contracts and compatibility](docs/components.md)
-- [Tests and staging checklist](docs/testing.md)
 - [ACME HTTP Connector integration](docs/acme-connector.md)
 - [Debian 12 installation and isolated dependencies](docs/debian-installation.md)
 - [External certificate import and replacement](docs/certificate-import.md)
 - [Operations and recovery](docs/operations.md)
 - [Operation correlation and optional Auton receipts](docs/operation-correlation.md)
 - [Coding conventions and contributions](CONTRIBUTING.md)
-- [Brand assets](assets/brand/README.md)
 
-## Development checks
-
-Run both suites with the runtime dependencies installed:
-
-```sh
-python -m pip install -r requirements.txt
-python .github/scripts/check-test-collection.py --runner unittest tests tests/contracts
-python -m unittest discover -s tests -v
-python -m unittest discover -s tests/contracts -v
-```
-
-Build a source archive and a wheel in an isolated build environment:
-
-```sh
-python -m pip install build
-python -m build
-```
-
-Build dependencies (including PyYAML, needed to read `setup.yml`) are declared
-in `pyproject.toml`. Direct dependency floors match the tested baseline in `constraints-minimum.txt`.
-CI exercises both that baseline and the latest resolvable dependencies.
-Versioned releases publish to PyPI after the test, lifecycle and package checks.
-Debian packaging targets Debian 12 / Python 3.11 on amd64. See the
-[installation guide](docs/debian-installation.md) and validation instructions in
-[testing](docs/testing.md). Installed-unit start/stop/restart is checked under
-disposable systemd PID 1. Controlled stop/restart during issuance and deployment is also verified through
-the installed unit. Historical upgrades, host reboot and other distributions
-remain separate gates.
 
 Guide: [Certificate observations and supervision](docs/supervision.md).
 
@@ -101,3 +69,8 @@ Guide: [Certificate observations and supervision](docs/supervision.md).
 
 See [configuration validation](docs/configuration-validation.md) for YAML schema
 coverage and compatibility.
+
+## Documentation
+
+- **Users:** installation, configuration, operation and API usage in this README and the user guide.
+- **Contributors:** [architecture, tests and development](https://github.com/decryptus/certlord/blob/main/CONTRIBUTING.md).

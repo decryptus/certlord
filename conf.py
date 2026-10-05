@@ -15,3 +15,8 @@ myst_heading_anchors = 4
 include_patterns = ["index.rst", "docs/**", "MIGRATION.md"]
 extensions.append("sphinxcontrib.mermaid")
 myst_fence_as_directive = ["mermaid"]
+
+# Keep both documentation audiences explicit on every generated page.
+templates_path = ['_templates']
+html_context = {'contributor_index': 'docs/contributors', 'contributor_pages': ['docs/contributors', 'docs/contributing', 'docs/architecture', 'docs/components', 'docs/testing']}
+html_sidebars = {'**': ['about.html', 'documentation-tracks.html', 'localtoc.html', 'searchbox.html']}
