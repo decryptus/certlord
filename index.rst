@@ -19,6 +19,7 @@ Installation, configuration, operation and troubleshooting.
    docs/certificate-identity
    docs/supervision
    docs/screenshots
+   docs/textual
    docs/rc-evaluation
    MIGRATION
 

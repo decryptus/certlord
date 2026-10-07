@@ -2,6 +2,8 @@
 import argparse
 import asyncio
 import hashlib
+import importlib.metadata
+import dwho.tui.textual
 import json
 import os
 os.environ.pop("NO_COLOR", None)
@@ -48,7 +50,10 @@ async def capture(output, png=False):
     except (OSError, subprocess.CalledProcessError):
         revision, dirty = None, True
     (output / 'textual-manifest.json').write_text(json.dumps(dict(synthetic=True,
-        renderer='Textual', source_revision=revision, dirty=dirty, source_sha256=sources, captures=artifacts), indent=2)+'\n')
+        renderer='Textual', textual_version=importlib.metadata.version('textual'),
+        dwho_version=importlib.metadata.version('dwho'),
+        shared_source_sha256={p.name: hashlib.sha256(p.read_bytes()).hexdigest()
+                              for p in Path(dwho.tui.textual.__file__).parent.glob('*.py')}, source_revision=revision, dirty=dirty, source_sha256=sources, captures=artifacts), indent=2)+'\n')
 
 
 def save(app, output, name, artifacts, png):
