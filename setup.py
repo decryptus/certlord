@@ -40,6 +40,7 @@ setup(
     scripts                       = ['bin/certlord'],
     packages                      = find_packages(include=['certlord', 'certlord.*']),
     install_requires              = requirements,
+    extras_require                = {'textual': ['dwho[textual]>=0.3.65']},
     python_requires               = ', '.join(setup_cfg['python_requires']),
     classifiers                   = setup_cfg['classifiers'],
     long_description              = long_desc,

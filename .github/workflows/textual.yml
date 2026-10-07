@@ -1,0 +1,20 @@
+name: Textual terminal tests
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  textual:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: python -m pip install '.[textual]' resvg-py
+      - run: python .github/scripts/check-test-collection.py --runner unittest textual_tests
+      - run: python -m unittest discover -s textual_tests -v
+      - run: python scripts/capture_textual.py --output /tmp/textual-captures --png
+      - uses: actions/upload-artifact@v4
+        with:
+          name: textual-captures
+          path: /tmp/textual-captures

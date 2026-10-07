@@ -1,4 +1,9 @@
-# CertLord 1.0.0rc1
+# CertLord 1.0.0rc2
+
+Adds an optional Textual certificate browser (`pip install "certlord[textual]"`,
+then `certlord tui --ui textual`). Inventory and detail reads retain the existing
+client permissions and do not issue or remove certificates.
+
 
 Release candidate prepared on 2026-10-03. This is not the final 1.0.0 release.
 
@@ -22,7 +27,7 @@ deployment jobs. See [installation](debian-installation.md),
 After the candidate is published, install its exact version in an isolated environment:
 
 ```sh
-python -m pip install 'certlord==1.0.0rc1'
+python -m pip install 'certlord==1.0.0rc2'
 ```
 
 ## Limits
