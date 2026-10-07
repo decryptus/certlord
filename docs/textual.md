@@ -1,5 +1,10 @@
 # Textual terminal interface
 
+The Textual interface uses a gold and charcoal palette with DWho 0.3.66 or newer.
+Navigation, tables and dialogs share the product colors. Labeled status colors
+remain consistent across products: blue acceptance, violet in progress, green
+success, amber warning or uncertainty, and red failure.
+
 Install the optional extra with `pip install "certlord[textual]"`.
 
 Run `certlord tui --ui textual`. Search the managed certificate inventory,
