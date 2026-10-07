@@ -9,7 +9,7 @@
 
 TLS certificate lifecycle automation.
 
-Version: **1.0.0rc1 — release candidate**. See the [release notes](docs/release-notes.md).
+Version: **1.0.0rc2 — release candidate**. See the [release notes](docs/release-notes.md).
 
 CertLord automates TLS certificate issuance, renewal and deployment. It supports
 ACME through Certbot and importing existing PEM certificates, stores certificates
