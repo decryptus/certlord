@@ -1,6 +1,6 @@
 # CLI and terminal browser
 
-These captures run the real CertLord 1.0.0rc1 client against a read-only HTTP
+These captures run the real CertLord 1.0.0rc2 client against a read-only HTTP
 fixture on loopback. Domains, UUIDs and statuses are synthetic demonstration data.
 They illustrate the interface, not successful issuance or deployment. No Vault,
 Redis, private keys, credentials or production hosts are involved.
@@ -56,3 +56,8 @@ Pixel rendering can vary with font/system libraries; inspect the images before
 updating committed screenshots. Refresh them when UI behavior or examples change.
 See [authentication and command options](certificate-identity.md) before connecting
 the client to your own service.
+
+## Textual browser
+
+The [Textual guide](textual.md) shows the current optional browser with synthetic fixtures.
+The curses captures above document the compatibility interface.

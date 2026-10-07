@@ -23,3 +23,7 @@ include docs/release-notes.md
 include docs/screenshots.md docs/rc-evaluation.md
 recursive-include docs/images *.png *.txt *.json
 include scripts/capture_docs.py scripts/requirements-docs.txt
+
+include docs/textual.md
+recursive-include textual_tests *.py
+include scripts/capture_textual.py

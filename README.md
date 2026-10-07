@@ -9,7 +9,7 @@
 
 TLS certificate lifecycle automation.
 
-Version: **1.0.0rc1 — release candidate**. See the [release notes](docs/release-notes.md).
+Version: **1.0.0rc2 — release candidate**. See the [release notes](docs/release-notes.md).
 
 CertLord automates TLS certificate issuance, renewal and deployment. It supports
 ACME through Certbot and importing existing PEM certificates, stores certificates
@@ -27,7 +27,7 @@ must be provisioned separately; see the [installation guide](docs/debian-install
 Use ordinary commands in scripts, or explicitly open the read-only terminal browser
 with `certlord tui`. [View the illustrated guide](docs/screenshots.md).
 
-![CertLord terminal inventory with demonstration certificates](docs/images/tui-inventory.png)
+![CertLord terminal inventory with demonstration certificates](docs/images/textual-inventory.png)
 
 Real client capture with synthetic demonstration data; this is not deployment evidence.
 
@@ -74,3 +74,7 @@ coverage and compatibility.
 
 - **Users:** installation, configuration, operation and API usage in this README and the user guide.
 - **Contributors:** [architecture, tests and development](https://github.com/decryptus/certlord/blob/main/CONTRIBUTING.md).
+
+## Textual terminal interface
+
+See the [Textual guide](docs/textual.md) for installation, navigation and operation confirmations.

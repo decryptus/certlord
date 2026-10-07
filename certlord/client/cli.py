@@ -17,6 +17,8 @@ def parser():
         sub.add_argument('--url', default=os.environ.get('CERTLORD_API_URL', 'http://127.0.0.1:8666'))
         sub.add_argument('--ca', default=os.environ.get('CERTLORD_API_CA') or True, help='Trusted CA bundle')
         sub.add_argument('--timeout', type=float, default=10)
+        if command == 'tui':
+            sub.add_argument('--ui', choices=('curses', 'textual'), default='curses')
         if command != 'tui':
             sub.add_argument('--json', action='store_true', help='Full UUIDs, machine-readable output')
         if command == 'list':
@@ -43,7 +45,10 @@ def main(argv=None):
         client = CertificateClient(args.url, os.environ.get('CERTLORD_API_USER'),
                                    os.environ.get('CERTLORD_API_PASSWORD'), args.ca, args.timeout)
         if args.command == 'tui':
-            from certlord.client.tui import run
+            if args.ui == 'textual':
+                from certlord.client.textual_tui import run
+            else:
+                from certlord.client.tui import run
             run(client)
             return 0
         if args.command == 'list':

@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 """certlord"""
 
-__version__ = '1.0.0rc1'
+__version__ = '1.0.0rc2'
 
 # Dispatch client commands before importing daemon modules or touching configuration.
 import sys

@@ -1,3 +1,11 @@
+certlord (1.0.0~rc2) UNRELEASED; urgency=medium
+
+  * Add optional Textual certificate inventory and detail browser.
+  * Keep the existing HTTP client and read-only terminal contract.
+  * Refresh documentation captures and optional interface tests.
+
+ -- Adrien Delle Cave <pypi@doowan.net>  Wed, 07 Oct 2026 00:00:00 +0000
+
 certlord (1.0.0~rc1) UNRELEASED; urgency=medium
 
   * Prepare the first public release candidate, Python version 1.0.0rc1.
