@@ -12,7 +12,7 @@ python .github/scripts/check-test-collection.py --runner unittest .github/tests
 python -m unittest discover -s .github/tests -v
 ```
 
-The baseline contains 233 unit cases and 11 component-contract cases. The helper
+The baseline contains 239 unit cases and 11 component-contract cases. The helper
 suite has eight cases, including one intentional skip for a pytest-only helper
 scenario. The project suites themselves use unittest. Empty, incomplete or duplicate
 collection must fail. Transport tests require permission to bind local sockets.
@@ -20,6 +20,14 @@ collection must fail. Transport tests require permission to bind local sockets.
 CI covers Python 3.11/3.12 with minimum and latest dependency resolution, builds
 source/wheel packages and reruns suites against the installed wheel outside the
 checkout. See `.github/workflows/tests.yml` and `constraints-minimum.txt`.
+
+The optional Textual suite has one case and runs separately:
+
+```sh
+python -m pip install ".[textual]"
+python .github/scripts/check-test-collection.py --runner unittest textual_tests
+python -m unittest discover -s textual_tests -v
+```
 
 ## Disposable integration environments
 

@@ -27,3 +27,8 @@ include scripts/capture_docs.py scripts/requirements-docs.txt
 include docs/textual.md
 recursive-include textual_tests *.py
 include scripts/capture_textual.py
+
+# Ship both complete documentation entry points in the source archive.
+include conf.py index.rst docs/requirements.txt
+recursive-include _templates *.html
+recursive-include docs *.md *.rst
