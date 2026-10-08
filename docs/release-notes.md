@@ -20,8 +20,8 @@ daemon; the operating limits below remain part of the release contract.
 
 Python 3.11/3.12 on POSIX; Debian packaging targets Debian 12 / amd64. Provision
 Vault, Redis and Auton separately. Use one active lifecycle daemon and idempotent
-deployment jobs. See [installation](debian-installation.md),
-[configuration and operations](operations.md) and [installation evaluation](rc-evaluation.md).
+deployment jobs. See [installation](https://github.com/decryptus/certlord/blob/v1.0.0/docs/debian-installation.md),
+[configuration and operations](https://github.com/decryptus/certlord/blob/v1.0.0/docs/operations.md) and [installation evaluation](https://github.com/decryptus/certlord/blob/v1.0.0/docs/rc-evaluation.md).
 
 Install the exact stable version:
 
