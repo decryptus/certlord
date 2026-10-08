@@ -1,8 +1,8 @@
-# Evaluate CertLord 1.0.0rc2
+# Evaluate CertLord 1.0.0
 
 Use a disposable environment and test domains/destinations under your control.
-This release candidate is not the final 1.0.0. The steps below are an evaluation
-plan; they are not a report that your deployment passed.
+The steps below evaluate your installation of the stable release. They are an
+evaluation plan, not a report that your deployment passed.
 
 An existing production deployment is not required. Use a local test CA and
 disposable services for evaluation. Contributors can run the existing automated
@@ -15,7 +15,7 @@ With Python 3.11 or 3.12 on POSIX:
 ```sh
 python -m venv .venv-certlord
 . .venv-certlord/bin/activate
-python -m pip install 'certlord==1.0.0rc2'
+python -m pip install 'certlord==1.0.0'
 python -m pip check
 python -c 'from importlib.metadata import version; print(version("certlord"))'
 certlord list --help
@@ -86,5 +86,5 @@ Follow the [operations runbook](operations.md) in the isolated environment:
 Keep deployment details, logs and evidence private. Record failures as failures,
 not as completed checklist items. The current implementation does not guarantee
 exactly-once remote execution, multi-active operation, saturation capacity or
-absence of leaks. A stable-release decision needs a scoped review of results and
-remaining limits; completing these instructions does not automatically publish or deploy.
+absence of leaks. Review results and remaining limits before using your installation; completing
+these instructions does not automatically deploy a service.

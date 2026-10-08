@@ -1,11 +1,8 @@
-# CertLord 1.0.0rc2
+# CertLord 1.0.0
 
-Adds an optional Textual certificate browser (`pip install "certlord[textual]"`,
-then `certlord tui --ui textual`). Inventory and detail reads retain the existing
-client permissions and do not issue or remove certificates.
-
-
-Release candidate prepared on 2026-10-03. This is not the final 1.0.0 release.
+First stable release — 8 October 2026. Promotes the qualified rc2 feature set
+without adding runtime features. The supported topology uses one active lifecycle
+daemon; the operating limits below remain part of the release contract.
 
 ## Included
 
@@ -16,18 +13,20 @@ Release candidate prepared on 2026-10-03. This is not the final 1.0.0 release.
 - Redis work tracking, deployment leases, retries and bounded worker shutdown.
 - Auton deployment, optional confirmed remote receipts and destination TLS checks.
 - Authenticated certificate/worker observations and Prometheus metrics.
+- Optional read-only Textual browser: install `certlord[textual]` and run
+  `certlord tui --ui textual`.
 
-## Evaluation
+## Installation and supported scope
 
 Python 3.11/3.12 on POSIX; Debian packaging targets Debian 12 / amd64. Provision
 Vault, Redis and Auton separately. Use one active lifecycle daemon and idempotent
-deployment jobs. See [installation](debian-installation.md),
-[configuration and operations](operations.md) and [testing](testing.md).
+deployment jobs. See [installation](https://github.com/decryptus/certlord/blob/v1.0.0/docs/debian-installation.md),
+[configuration and operations](https://github.com/decryptus/certlord/blob/v1.0.0/docs/operations.md) and [installation evaluation](https://github.com/decryptus/certlord/blob/v1.0.0/docs/rc-evaluation.md).
 
-After the candidate is published, install its exact version in an isolated environment:
+Install the exact stable version:
 
 ```sh
-python -m pip install 'certlord==1.0.0rc2'
+python -m pip install 'certlord==1.0.0'
 ```
 
 ## Limits
@@ -41,4 +40,4 @@ Rehearse backup restoration, credential rotation and uncertain-job recovery on
 your deployment. Disposable CI does not establish production readiness, saturation
 capacity or long-duration stability. Live monitoring providers and additional
 platforms require separate qualification. No automatic production deployment is
-performed by publishing this candidate.
+performed by publishing this release.

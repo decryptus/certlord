@@ -9,7 +9,7 @@
 
 TLS certificate lifecycle automation.
 
-Version: **1.0.0rc2 — release candidate**. See the [release notes](docs/release-notes.md).
+Version: **1.0.0 — stable**. See the [release notes](docs/release-notes.md).
 
 CertLord automates TLS certificate issuance, renewal and deployment. It supports
 ACME through Certbot and importing existing PEM certificates, stores certificates
@@ -44,14 +44,14 @@ System configuration and external services must also be provisioned. The
 Debian 12 package includes an isolated Python environment and the service account;
 follow the installation guide before enabling the service.
 Repository: https://github.com/decryptus/certlord.
-This candidate is intended for evaluation; production acceptance remains deployment-specific.
+Validate configuration, recovery and credentials in an isolated environment before deploying your service.
 
 See [MIGRATION.md](MIGRATION.md) before updating an existing installation.
 
 ## Project documentation
 
 - [CLI and TUI screenshots](docs/screenshots.md)
-- [Evaluate the release candidate](docs/rc-evaluation.md)
+- [Evaluate your installation](docs/rc-evaluation.md)
 - [Certificate UUIDs, HTTP API, CLI and TUI](docs/certificate-identity.md)
 - [ACME HTTP Connector integration](docs/acme-connector.md)
 - [Debian 12 installation and isolated dependencies](docs/debian-installation.md)
