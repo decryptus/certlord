@@ -1,8 +1,12 @@
-# Evaluate CertLord 1.0.0rc1
+# Evaluate CertLord 1.0.0rc2
 
 Use a disposable environment and test domains/destinations under your control.
 This release candidate is not the final 1.0.0. The steps below are an evaluation
 plan; they are not a report that your deployment passed.
+
+An existing production deployment is not required. Use a local test CA and
+disposable services for evaluation. Contributors can run the existing automated
+[lifecycle acceptance harness](testing.md#disposable-integration-environments).
 
 ## 1. Install the published client/package
 
@@ -11,7 +15,7 @@ With Python 3.11 or 3.12 on POSIX:
 ```sh
 python -m venv .venv-certlord
 . .venv-certlord/bin/activate
-python -m pip install 'certlord==1.0.0rc1'
+python -m pip install 'certlord==1.0.0rc2'
 python -m pip check
 python -c 'from importlib.metadata import version; print(version("certlord"))'
 certlord list --help
