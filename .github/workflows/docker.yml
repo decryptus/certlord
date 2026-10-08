@@ -38,7 +38,9 @@ jobs:
         run: docker compose exec -T certlord python -m pip check
       - name: Sanitized service state
         if: always()
-        run: docker compose ps -a
+        run: |
+          docker compose ps -a
+          docker compose logs --tail 30 vault
       - name: Remove disposable stack
         if: always()
         run: docker compose down -v --remove-orphans

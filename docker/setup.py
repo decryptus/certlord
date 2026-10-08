@@ -159,7 +159,7 @@ def main():
 if __name__ == '__main__':
     try:
         main()
-    except Exception:
+    except Exception as error:
         # Backend exceptions can contain sensitive request/response data.
-        print('Setup failed; check Vault availability and the protected bootstrap files. No files were deleted.', file=sys.stderr)
+        print('Setup failed (' + type(error).__name__ + '); check Vault availability and the protected bootstrap files. No files were deleted.', file=sys.stderr)
         sys.exit(1)
