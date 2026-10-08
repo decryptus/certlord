@@ -11,7 +11,7 @@ LABEL org.opencontainers.image.title="CertLord" \
       org.opencontainers.image.source="https://github.com/decryptus/certlord" \
       org.opencontainers.image.version=$VERSION \
       org.opencontainers.image.licenses="GPL-3.0-or-later"
-RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates libcurl4 openssh-client && rm -rf /var/lib/apt/lists/* \
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates libcurl4 libmagic1 openssh-client && rm -rf /var/lib/apt/lists/* \
     && groupadd --gid 10001 certlord && useradd --uid 10001 --gid certlord --create-home certlord
 COPY --from=build /wheels /wheels
 RUN python -m pip install --no-index --find-links=/wheels certlord certbot certbot-httpreq acme-http-connector auton autond textual && rm -rf /wheels \
