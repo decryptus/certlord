@@ -40,6 +40,16 @@ except hvac.exceptions.Forbidden:
 else:
     raise AssertionError('Runtime Vault credentials can administer Vault')
 a = credentials['auton']
+import time
+for attempt in range(30):
+    try:
+        if requests.get(a['uri'] + '/health', auth=(a['auth-user'], a['auth-passwd']), timeout=2).status_code == 200:
+            break
+    except requests.RequestException:
+        pass
+    time.sleep(1)
+else:
+    raise AssertionError('Auton did not become ready')
 assert requests.get(a['uri'] + '/health', timeout=10).status_code == 401
 assert requests.get(a['uri'] + '/health', auth=(a['auth-user'], a['auth-passwd']), timeout=10).status_code == 200
 assert not os.path.exists('/bootstrap/vault-recovery.json')

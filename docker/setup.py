@@ -111,7 +111,7 @@ def initialize(args, client):
         route['auth'] = True
     dump(ROOT / 'auton/auton.yml', {
         'general': {'listen_addr': '0.0.0.0', 'listen_port': 8080, 'auth_mode': 'required',
-                    'auth_basic': 'Auton', 'auth_basic_file': '/etc/auton/api.htpasswd', 'max_workers': 3},
+                    'auth_basic': 'Auton', 'auth_basic_file': '/etc/auton/api.htpasswd', 'max_workers': 3, 'lock_timeout': 30},
         'modules': routes,
         'endpoints': {'deploy': {'plugin': 'subproc', 'config': {
             'prog': '/bin/sh', 'args': ['/deploy/deploy.sh'], 'timeout': 240,
