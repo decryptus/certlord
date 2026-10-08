@@ -93,3 +93,26 @@ Pixel rendering can vary with font/system libraries; inspect the images before
 updating committed screenshots. Refresh them when UI behavior or examples change.
 See [authentication and command options](certificate-identity.md) before connecting
 the client to your own service.
+
+## Container maintenance
+
+`Dockerfile` builds the checkout with Python 3.12 and the qualified external
+clients. The Docker workflow runs `docker/smoke.sh` on native Linux AMD64 and ARM64
+runners before publishing. The smoke check exercises a real Compose installation,
+authenticated APIs, scoped Vault access, explicit unseal and persisted data after
+restart. It does not qualify arbitrary user deployment scripts or replace the
+full Pebble lifecycle workflow.
+
+The Docker Hub repository is `decryptus/certlord`. Publication uses the repository
+secret `DOCKERHUB_TOKEN` (a token authorized to push to that repository); credentials
+configured in another repository are not inherited. Stable release publication or
+the Docker workflow's explicit `publish` input on main enables publication after
+both architecture checks succeed. Initial image publication for an existing tag
+uses that manual workflow; never move an existing source release tag.
+
+Keep image/version references, Compose templates and the user installation guide
+aligned. Base image tags and transitive Python dependencies are not fully locked;
+this is not a reproducible/offline build. Rebuild and validate for security updates.
+The image embeds `docker/certlord.example.yml`; synchronize it when changing the
+main example. Never include `.local/`, user credentials or private acceptance logs
+in build contexts, source archives or workflow artifacts.

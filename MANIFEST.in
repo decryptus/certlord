@@ -32,3 +32,6 @@ include scripts/capture_textual.py
 include conf.py index.rst docs/requirements.txt
 recursive-include _templates *.html
 recursive-include docs *.md *.rst
+
+include Dockerfile .dockerignore compose.yaml
+recursive-include docker *.py *.sh *.hcl *.conf *.yml

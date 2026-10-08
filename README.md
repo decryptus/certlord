@@ -19,8 +19,14 @@ are optional; expiry observations are exposed for an external supervision system
 It uses DWho, HTTPdis and Sonicprobe.
 
 Redis stores temporary ACME HTTP-01 challenge responses and tracks pending work,
-retries and deployment leases. Vault stores certificate material. Both services
-must be provisioned separately; see the [installation guide](docs/debian-installation.md).
+retries and deployment leases. Vault stores certificate material. Use the [Docker Compose installation](docs/docker-compose.md) to run the services
+together, or provision them separately for the [Debian installation](docs/debian-installation.md).
+
+## Docker installation
+
+Use the [Compose guide](docs/docker-compose.md) for initialization, persistent
+Vault storage, API access and deployment configuration. The application image is
+`decryptus/certlord:1.0.0`.
 
 ## Command line and terminal interface
 

@@ -8,6 +8,7 @@ Installation, configuration, operation and troubleshooting.
    :caption: User guide
 
    docs/certificate-import
+   docs/docker-compose
    docs/debian-installation
    docs/configuration-validation
    docs/operations
