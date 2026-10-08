@@ -1,0 +1,90 @@
+name: certlord
+x-image: &image
+  image: ${CERTLORD_IMAGE:-decryptus/certlord:1.0.0}
+  build:
+    context: .
+services:
+  vault:
+    image: hashicorp/vault:1.21.4
+    command: ["server", "-config=/vault/config/server.hcl"]
+    environment:
+      VAULT_ADDR: http://127.0.0.1:8200
+    cap_add: [IPC_LOCK]
+    volumes:
+      - vault-data:/vault/file
+      - ./docker/vault.hcl:/vault/config/server.hcl:ro
+    networks: [backend]
+    restart: unless-stopped
+  redis:
+    image: redis:7.4-alpine
+    command: ["redis-server", "--appendonly", "yes", "--appendfsync", "everysec"]
+    volumes: [redis-data:/data]
+    networks: [backend]
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+  setup:
+    <<: *image
+    profiles: [tools]
+    user: "0:0"
+    entrypoint: ["python", "/opt/certlord-docker/setup.py"]
+    volumes:
+      - ./.local:/bootstrap
+    networks: [backend]
+  certlord:
+    <<: *image
+    depends_on:
+      redis:
+        condition: service_healthy
+      vault:
+        condition: service_started
+      auton:
+        condition: service_started
+    ports: ["127.0.0.1:${CERTLORD_PORT:-8666}:8666"]
+    volumes:
+      - ./.local/certlord:/etc/certlord:ro
+      - certlord-data:/var/lib/certlord
+    networks: [backend, outbound]
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 30s
+    security_opt: [no-new-privileges:true]
+    healthcheck:
+      test: ["CMD", "python", "/opt/certlord-docker/health.py"]
+      interval: 20s
+      timeout: 15s
+      retries: 3
+      start_period: 30s
+  auton:
+    <<: *image
+    command: ["autond", "-f", "-u", "certlord", "-g", "certlord", "-c", "/etc/auton/auton.yml", "-p", "/var/lib/auton/auton.pid", "--logfile", "/var/lib/auton/auton.log"]
+    volumes:
+      - ./.local/auton:/etc/auton:ro
+      - ./.local/deploy:/deploy:ro
+      - auton-data:/var/lib/auton
+    networks: [backend, outbound]
+    restart: unless-stopped
+    init: true
+    stop_grace_period: 30s
+    security_opt: [no-new-privileges:true]
+  challenges:
+    image: nginx:1.28-alpine
+    profiles: [http01]
+    ports: ["${HTTP01_BIND:-0.0.0.0}:${HTTP01_PORT:-80}:8080"]
+    volumes:
+      - ./docker/challenges.conf:/etc/nginx/conf.d/default.conf:ro
+    networks: [backend, outbound]
+    depends_on: [certlord]
+    restart: unless-stopped
+volumes:
+  vault-data:
+  redis-data:
+  certlord-data:
+  auton-data:
+networks:
+  backend:
+    internal: true
+  outbound: {}

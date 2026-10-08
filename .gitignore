@@ -6,3 +6,6 @@ build/
 dist/
 *.egg-info/
 etc/certlord/credentials.yml
+
+.local/
+.env

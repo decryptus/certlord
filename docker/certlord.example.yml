@@ -1,0 +1,180 @@
+general:
+  listen_addr:   0.0.0.0
+  listen_port:   8666
+  max_workers:   40
+  max_requests:  5000
+  max_life_time: 3600
+  lock_timeout:  60
+  charset:       utf-8
+  content_type:  'application/json; charset=utf-8'
+  redis:
+    letsencrypt:
+      url:       'redis://127.0.0.1:6379?db=0&socket_timeout=5&socket_connect_timeout=5'
+    ssl_certs:
+      url:       'redis://127.0.0.1:6379?db=1&socket_timeout=5&socket_connect_timeout=5'
+  #auth_basic:      'Restricted'
+  #auth_basic_file: '/etc/certlord/certlord.passwd'
+# Enable HTTPdis authentication above and grant operations to verified users.
+api_authentication:
+  backend: httpdis
+  permissions: {}
+  # permissions:
+  #   operator: [read, write, deploy]
+  #   acme-connector: [write, challenge]
+certificate_storage:
+  backend: vault
+credentials: credentials.yml
+ssl_checkers:
+  statuscake:
+    enabled: false
+    timeout: 10
+    alert_at: '1,7,28'
+    alert_broken: true
+    alert_expiry: true
+    alert_mixed: true
+    alert_reminder: true
+    checkrate: 3600
+    contact_groups: []  # Configure your own monitoring contact groups.
+  updown:
+    enabled: false
+    timeout: 10
+    apdex_t: 2.0
+    disabled_locations:
+      - bhs
+      - fra
+      - mia
+      - sin
+      - syd
+      - tok
+    period: 3600
+    recipients: []  # Configure your own monitoring recipients.
+modules:
+  letsencrypt:
+    # Atomic Redis expiry bounds orphan retention if the ACME client cannot clean up.
+    # Keep longer than the longest expected challenge validation/command duration.
+    challenge_ttl: 3600
+    routes:
+      well_known_delete:
+        handler:   'well_known_delete'
+        regexp:    '^\.well-known/acme-challenge/(?P<challenge>[0-9A-Za-z_\-]{43})/?$'
+        op:        'DELETE'
+      well_known_get:
+        handler:   'well_known_get'
+        regexp:    '^\.well-known/acme-challenge/(?P<challenge>[0-9A-Za-z_\-]{43})/?$'
+        op:        'GET'
+      well_known_put:
+        handler:   'well_known_put'
+        regexp:    '^\.well-known/acme-challenge/(?P<challenge>[0-9A-Za-z_\-]{43})/?$'
+        safe_init: true
+        op:        'PUT'
+  ssl_certs:
+    operation_scan_limit: 10000
+    renew_before_expiry: 30
+    delay_reset_retries: 86400
+    max_retries: 5
+    processing_delay: 900
+    # Bounds for each Certbot/Auton command and shutdown (seconds).
+    command_timeout: 300
+    process_stop_grace: 2
+    worker_stop_timeout: 10
+    # Optional post-deployment TLS check, one explicit destination per UUID.
+    # Uses the certificate domain for SNI/hostname verification. No insecure mode.
+    tls_verification:
+      timeout: 10
+      targets: {}
+      # targets:
+      #   12345678-1111-4111-8111-111111111111:
+      #     host: 192.0.2.10
+      #     port: 443
+      #     ca_file: /etc/certlord/trusted-ca.pem  # omit for system roots
+    # Shared budget per DNS policy check (CAA ancestors share one budget).
+    dns_timeout: 5
+    certbot_check_interval: 5
+    deployer_check_interval: 86400
+    vault_check_interval: 43200
+    # Optional DNS authorization rules. Empty means no CNAME/TXT allow check.
+    # Configure your own patterns before enabling this policy.
+    allow_dns_resolv: {}
+    expected_caa_records:
+      - null
+      - '^letsencrypt\.org$'
+    auton:
+      # Opt in to confirmed single-job JSON receipts (Auton 1.2.1 tested).
+      receipt_mode: false
+      become:
+        enabled: false
+      #search_paths: []
+      #args: []
+    certbot:
+      become:
+        enabled: true
+      #search_paths: []
+      #args: []
+    routes:
+      live:
+        handler: live
+        name: api/health/live
+        op: GET
+      ready:
+        handler: ready
+        name: api/health/ready
+        op: GET
+      operation_metrics:
+        handler: operation_metrics
+        name: api/operations/metrics
+        op: GET
+      operations:
+        handler: operations
+        name: api/operations
+        op: GET
+      deploy:
+        handler:   'deploy'
+        name:      'api/ssl-certs/deploy'
+        op:        'POST'
+      save:
+        handler:   'save'
+        name:      'api/ssl-certs/save'
+        op:        'POST'
+      validate:
+        handler:   'validate'
+        regexp:    '^api/ssl-certs/validate/(?P<sub_domain>[^/]+)/?$'
+        op:        'GET'
+      create:
+        handler:   'create'
+        name:      'api/certificates'
+        op:        'POST'
+      replace_import:
+        handler:   'replace_import'
+        regexp:    '^api/certificates/(?P<certificate_id>[0-9a-f-]{36})/material/?$'
+        op:        'PUT'
+      import_certificate:
+        handler:   'import_certificate'
+        name:      'api/certificates/import'
+        op:        'POST'
+      observations:
+        handler: observations
+        name: api/certificates/observations
+        op: GET
+      metrics:
+        handler: metrics
+        name: api/certificates/metrics
+        op: GET
+      inventory:
+        handler:   'inventory'
+        name:      'api/certificates'
+        op:        'GET'
+      upsert:
+        handler:   'upsert'
+        regexp:    '^api/certificates/(?P<certificate_id>[0-9a-f-]{36})/?$'
+        op:        'PUT'
+      remove:
+        handler:   'remove'
+        regexp:    '^api/certificates/(?P<certificate_id>[0-9a-f-]{36})/?$'
+        op:        'DELETE'
+      index:
+        handler:   'index'
+        regexp:    '^api/certificates/(?P<certificate_id>[0-9a-f-]{36})/?$'
+        safe_init: true
+        at_start:  true
+        at_stop:   true
+        op:        'GET'
