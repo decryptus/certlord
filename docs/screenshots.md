@@ -1,6 +1,6 @@
 # CLI and terminal browser
 
-These captures run the real CertLord 1.0.0 client against a read-only HTTP
+These captures run the real CertLord 1.0.1 client against a read-only HTTP
 fixture on loopback. Domains, UUIDs and statuses are synthetic demonstration data.
 They illustrate the interface, not successful issuance or deployment. No Vault,
 Redis, private keys, credentials or production hosts are involved.

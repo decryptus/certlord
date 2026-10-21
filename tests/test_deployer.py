@@ -33,6 +33,16 @@ class DeployerTests(unittest.TestCase):
         self.assertIsNone(self.deployer._proc)
 
     @patch('certlord.classes.deployer.CommandRunner.run')
+    def test_output_overflow_never_acknowledges_deployment_or_releases_uncertain_lease(self, run):
+        from certlord.adapters.processes import CommandOutputLimit
+        run.side_effect = CommandOutputLimit('Command output limit exceeded')
+        with self.assertLogs('certlord.classes.deployer', level='ERROR'):
+            self.deployer._run()
+        self.assert_pending()
+        self.deployer._lease.release.assert_not_called()
+        run.assert_called_once()
+
+    @patch('certlord.classes.deployer.CommandRunner.run')
     def test_launch_failure_preserves_pending_deployment(self, popen):
         popen.side_effect = OSError('executable not found')
         with self.assertLogs('certlord.classes.deployer', level='ERROR'):

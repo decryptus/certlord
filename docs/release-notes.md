@@ -1,4 +1,20 @@
-# CertLord 1.0.0
+# CertLord 1.0.1
+
+This maintenance release bounds combined command stdout/stderr to 4 MiB and
+raises an explicit failure when output exceeds that budget. Truncated command
+output is never accepted as a successful receipt. Cleanup also bounds discarded
+output so a noisy child cannot extend termination indefinitely.
+
+Process selector initialization now occurs before launch. Launch or pipe
+registration failures close owned resources and terminate/reap a started child.
+The existing deployment retry policy remains unchanged: remote jobs still need
+idempotent behavior, and local process cleanup does not prove a remote effect
+was cancelled.
+
+Install with `python -m pip install --upgrade 'certlord==1.0.1'`, or use
+`decryptus/certlord:1.0.1` with the current Compose guide.
+
+## CertLord 1.0.0
 
 First stable release — 8 October 2026. Promotes the qualified rc2 feature set
 without adding runtime features. The supported topology uses one active lifecycle

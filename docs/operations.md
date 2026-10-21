@@ -7,6 +7,14 @@ Use [installation](debian-installation.md), [ACME configuration](acme-connector.
 and [TLS verification](tls-verification.md) for setup. Keep operational information
 and credentials private.
 
+## Command output limits
+
+Certbot and Auton commands may emit at most 4 MiB of combined standard output
+and standard error. Exceeding this limit fails the command and stops its local
+process group. It does not confirm cancellation of a remote deployment. A failed
+deployment remains pending and unacknowledged; inspect its remote outcome before
+retrying. Existing lease-expiry retries still require an idempotent deployment job.
+
 ## Health and current work
 
 All four GET routes require the existing `read` permission and disable caching:
