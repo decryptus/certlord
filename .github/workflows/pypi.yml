@@ -2,6 +2,7 @@ name: Release candidate and PyPI publication
 on:
   workflow_dispatch:
   push:
+    branches: [main]
     tags: ['v*']
   pull_request:
 permissions:
@@ -38,32 +39,32 @@ jobs:
           if-no-files-found: error
   tag:
     needs: build
-    if: (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') && github.repository == 'decryptus/certlord' && !github.event.repository.private
+    if: github.event_name != 'pull_request' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v')) && github.repository == 'decryptus/certlord' && !github.event.repository.private
     runs-on: ubuntu-latest
     permissions:
       contents: write
     outputs:
       version: ${{ steps.tag.outputs.version }}
+      publish: ${{ steps.tag.outputs.publish }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
+          fetch-depth: 0
           persist-credentials: false
       - id: tag
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          set -eu
+          set -euo pipefail
+          bash .github/scripts/select-release.sh
           version=$(cat VERSION)
           echo "version=$version" >> "$GITHUB_OUTPUT"
-          tag="v$version"
-          if existing=$(gh api "repos/$GITHUB_REPOSITORY/git/ref/tags/$tag" --jq '.object.sha'); then
-            test "$existing" = "$GITHUB_SHA"
-          else
-            gh api --method POST "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/$tag" -f sha="$GITHUB_SHA"
+          if ! git show-ref --verify --quiet "refs/tags/v$version"; then
+            gh api --method POST "repos/$GITHUB_REPOSITORY/git/refs" -f ref="refs/tags/v$version" -f sha="$GITHUB_SHA"
           fi
   publish:
     needs: [build, tag]
-    if: (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main') && github.repository == 'decryptus/certlord' && !github.event.repository.private
+    if: needs.tag.outputs.publish == 'true'
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
@@ -74,8 +75,11 @@ jobs:
           name: release-distributions
           path: dist/
       - uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          skip-existing: true
   github-release:
     needs: [publish, tag]
+    if: needs.tag.outputs.publish == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -93,6 +97,17 @@ jobs:
           RELEASE_TAG: v${{ needs.tag.outputs.version }}
         run: |
           set -eu
+          if gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            exit 0
+          fi
           prerelease_flag=''
           case "$RELEASE_TAG" in *rc*|*a[0-9]*|*b[0-9]*) prerelease_flag='--prerelease';; esac
           gh release create "$RELEASE_TAG" dist/* --verify-tag --title "CertLord $RELEASE_TAG" --notes-file docs/release-notes.md $prerelease_flag
+
+  docker-publication:
+    needs: [github-release, tag]
+    if: ${{ !contains(needs.tag.outputs.version, 'a') && !contains(needs.tag.outputs.version, 'b') && !contains(needs.tag.outputs.version, 'rc') }}
+    uses: ./.github/workflows/docker.yml
+    with:
+      publish: true
+    secrets: inherit

@@ -76,7 +76,7 @@ On Linux with Python 3.11/3.12 and DejaVu Sans Mono installed:
 ```sh
 python -m venv .venv-docs
 . .venv-docs/bin/activate
-python -m pip install 'certlord==1.0.0' -r scripts/requirements-docs.txt
+python -m pip install 'certlord==1.0.1' -r scripts/requirements-docs.txt
 python scripts/capture_docs.py --installed
 ```
 

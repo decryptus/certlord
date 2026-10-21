@@ -129,12 +129,12 @@ they must not be used to initialize or manage your existing cluster.
 
 A Vault HA cluster requires independent hosts, Raft quorum, a resilient endpoint
 and an unseal strategy. Three local containers do not protect against host failure.
-CertLord 1.0.0 still supports **one active lifecycle daemon** per state scope;
+CertLord 1.0.1 still supports **one active lifecycle daemon** per state scope;
 do not scale the CertLord service. Redis and Auton availability are separate concerns.
 
 ## Updates and logs
 
-The default image is `decryptus/certlord:1.0.0`. Set `CERTLORD_IMAGE` to an explicit
+The default image is `decryptus/certlord:1.0.1`. Set `CERTLORD_IMAGE` to an explicit
 published version or digest when upgrading. Back up first, review release notes,
 then run `docker compose pull` and `docker compose up -d`. Re-running setup does
 not migrate an existing configuration.

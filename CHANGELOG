@@ -1,3 +1,10 @@
+certlord (1.0.1) stable; urgency=medium
+
+  * Bound combined command output and clean up child processes on failures.
+  * Align release packaging, installation examples and documentation with 1.0.1.
+
+ -- Adrien Delle Cave <pypi@doowan.net>  Wed, 21 Oct 2026 12:00:00 +0000
+
 certlord (1.0.0) stable; urgency=medium
 
   * Publish the qualified rc2 feature set as the first stable release.

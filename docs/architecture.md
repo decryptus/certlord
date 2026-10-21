@@ -113,6 +113,17 @@ that process group, escalates to SIGKILL and reaps the direct child. The
 outside this mechanism. Killing the local Auton CLI does not cancel a remote job;
 its deployment remains pending and may require reconciliation before retrying.
 
+Command capture uses a shared 4 MiB stdout/stderr budget. A selector drains both
+pipes in bounded chunks; cleanup discards output without accumulating it. Overflow
+raises an error, never returns truncated success, and preserves the deployment's
+uncertain outcome and lease. This is a capture bound, not a whole-process memory
+or remote cancellation guarantee.
+
+The polling descriptor is acquired before launching a command. Failure to
+initialize polling never starts a child; a failed launch closes the descriptor,
+and failure to register an already launched child's pipes terminates and reaps
+that child through the same cleanup path.
+
 Stop signals are set before waking workers. The Certbot interval wait is
 interruptible. Runtime stop signals every worker first, then joins threads within
 one `worker_stop_timeout` budget (default 10 seconds). Threads still blocked in

@@ -1,4 +1,4 @@
-# Evaluate CertLord 1.0.0
+# Evaluate CertLord 1.0.1
 
 Use a disposable environment and test domains/destinations under your control.
 The steps below evaluate your installation of the stable release. They are an
@@ -15,7 +15,7 @@ With Python 3.11 or 3.12 on POSIX:
 ```sh
 python -m venv .venv-certlord
 . .venv-certlord/bin/activate
-python -m pip install 'certlord==1.0.0'
+python -m pip install 'certlord==1.0.1'
 python -m pip check
 python -c 'from importlib.metadata import version; print(version("certlord"))'
 certlord list --help
