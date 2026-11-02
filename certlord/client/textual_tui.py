@@ -5,7 +5,7 @@ from dwho.tui.textual import DetailPanel, ServiceDashboard, TableRow
 from textual.widgets import DataTable
 
 from certlord.client.api import ClientError
-from certlord.client.presentation import destination_lines
+from certlord.client.presentation import destination_lines, endpoint_lines
 from certlord.services.certificate_ids import short_ids
 
 
@@ -19,24 +19,37 @@ def detail_text(record):
 class CertificateApp(ServiceDashboard):
     BINDINGS = ServiceDashboard.BINDINGS + [('r', 'refresh', 'Refresh')]
 
-    def __init__(self, client, demo=False):
-        super().__init__(product='CertLord', heading='Managed certificates',
-                         columns=('DOMAINS', 'STATUS', 'CERTIFICATE'),
-                         navigation=(('certificates', 'Certificates'),),
-                         subtitle='SYNTHETIC DEMO' if demo else 'CERTIFICATE INVENTORY')
+    def __init__(self, client, demo=False, endpoints=False):
+        super().__init__(product='CertLord', heading='TLS endpoints' if endpoints else 'Managed certificates',
+                         columns=('ENDPOINT', 'STATUS', 'TLS NAME') if endpoints else ('DOMAINS', 'STATUS', 'CERTIFICATE'),
+                         navigation=(('endpoints', 'TLS endpoints'),) if endpoints else (('certificates', 'Certificates'),),
+                         subtitle='SYNTHETIC DEMO' if demo else ('INDEPENDENT TLS CHECKS' if endpoints else 'CERTIFICATE INVENTORY'))
+        self.endpoints = endpoints
         self.client, self.records = client, {}
 
     def on_mount(self):
         self.action_refresh()
 
     def failure(self, error):
+        if self.endpoints:
+            self.records = {}
+            self.display_rows([])
+            self.query_one(DetailPanel).show_details('TLS endpoints unavailable', 'Refresh to obtain current observations.')
         self.set_notice('warning', str(error) if isinstance(error, ClientError) else 'Certificate service unavailable.')
         self.set_activity('Displayed inventory may be stale. Press r to retry the read.')
 
     def action_refresh(self):
-        self.perform(self.client.inventory, self.loaded, self.failure)
+        self.perform(self.client.tls_endpoints if self.endpoints else self.client.inventory, self.loaded, self.failure)
 
     def loaded(self, records):
+        if self.endpoints:
+            self.records = {record['name']: record for record in records['endpoints']}
+            self.display_rows([TableRow(record['name'],
+                (record['name'], record['status'], record['server_name']),
+                record['name'], '\n'.join(endpoint_lines(record))) for record in self.records.values()])
+            self.set_notice('info', '%s TLS endpoints; %s fresh and verified' % (records['total'], records['verified']))
+            self.set_activity('Read-only observations. Press r to reload; this does not trigger checks or deployment.')
+            return
         ids = short_ids(records)
         self.records = {record['certificate_id']: record for record in records}
         self.display_rows([TableRow(record['certificate_id'],
@@ -49,6 +62,9 @@ class CertificateApp(ServiceDashboard):
         identity = event.row_key.value
         if identity not in self.records:
             return
+        if self.endpoints:
+            self.query_one(DetailPanel).show_details(identity, '\n'.join(endpoint_lines(self.records[identity])))
+            return
         self.perform(lambda: self.client.detail(identity), self.detail_loaded, self.failure)
 
     def detail_loaded(self, record):
@@ -56,5 +72,5 @@ class CertificateApp(ServiceDashboard):
         self.set_notice('info', 'Certificate details loaded.')
 
 
-def run(client):
-    CertificateApp(client).run()
+def run(client, endpoints=False):
+    CertificateApp(client, endpoints=endpoints).run()

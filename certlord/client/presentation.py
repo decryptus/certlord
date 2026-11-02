@@ -1,6 +1,18 @@
 """Shared read-only destination details for the CLI and terminal browser."""
 
 
+def endpoint_lines(record):
+    return ['Status: ' + record['status'],
+            'Connection: %s:%s' % (record['connect_host'], record['port']),
+            'TLS name: ' + record['server_name'],
+            'Fresh: ' + str(record['fresh']),
+            'Last check (Unix seconds): ' + str(record['checked_at']),
+            'Last result: ' + str(record['last_status']),
+            'Expected SHA-256: ' + (record['expected_fingerprint_sha256'] or 'not pinned'),
+            'Served SHA-256: ' + (record['observed_fingerprint_sha256'] or 'unavailable'),
+            'Error: ' + (record['error_code'] or 'none')]
+
+
 def destination_lines(record):
     deployment = record.get('deployment')
     if not isinstance(deployment, dict):

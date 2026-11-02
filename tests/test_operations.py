@@ -80,6 +80,8 @@ class OperationsTests(unittest.TestCase):
         runtime._store, runtime._redis = Mock(),Mock()
         runtime._redis.ping.return_value = {'fixture':True}
         runtime._cycles = None
+        from certlord.adapters.tls_endpoints import EndpointPlan
+        runtime._tls_plan = EndpointPlan(None)
         runtime._workers = []
         for name in ('certlord-certbot','certlord-crawler','certlord-deployer'):
             worker = Mock()
@@ -93,6 +95,18 @@ class OperationsTests(unittest.TestCase):
         self.assertEqual(runtime.live(),{'alive':True,'phase':'running'})
         self.assertEqual(runtime._store.mock_calls,[])
         self.assertEqual(runtime._redis.mock_calls,[])
+
+    def test_configured_tls_worker_is_required_for_readiness(self):
+        runtime = self.runtime()
+        runtime._tls_plan.targets['web'] = {}
+        self.assertFalse(runtime.readiness()['ready'])
+        worker = Mock()
+        worker.name = 'certlord-tls-monitor'
+        worker.is_alive.return_value = True
+        runtime._workers.append(worker)
+        self.assertTrue(runtime.readiness()['ready'])
+        worker.is_alive.return_value = False
+        self.assertFalse(runtime.readiness()['ready'])
 
     def test_ready_requires_workers_backends_and_running_phase(self):
         runtime = self.runtime()

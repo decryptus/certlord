@@ -1,0 +1,35 @@
+{
+  "status": "partial",
+  "verified": 1,
+  "total": 2,
+  "observed_at": 1793610400,
+  "stale_after": 350,
+  "endpoints": [
+    {
+      "name": "web-a",
+      "connect_host": "192.0.2.10",
+      "port": 443,
+      "server_name": "www.example.org",
+      "expected_fingerprint_sha256": null,
+      "observed_fingerprint_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "checked_at": 1793610390,
+      "last_status": "verified",
+      "fresh": true,
+      "status": "verified",
+      "error_code": null
+    },
+    {
+      "name": "proxy-b",
+      "connect_host": "192.0.2.20",
+      "port": 443,
+      "server_name": "www.example.org",
+      "expected_fingerprint_sha256": null,
+      "observed_fingerprint_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "checked_at": 1793610000,
+      "last_status": "verified",
+      "fresh": false,
+      "status": "stale",
+      "error_code": null
+    }
+  ]
+}

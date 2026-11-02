@@ -19,6 +19,7 @@ def parser():
         sub.add_argument('--timeout', type=float, default=10)
         if command == 'tui':
             sub.add_argument('--ui', choices=('curses', 'textual'), default='curses')
+            sub.add_argument('--view', choices=('certificates', 'tls-endpoints'), default='certificates')
         if command != 'tui':
             sub.add_argument('--json', action='store_true', help='Full UUIDs, machine-readable output')
         if command == 'list':
@@ -53,9 +54,13 @@ def main(argv=None):
                 from certlord.client.textual_tui import run
             else:
                 from certlord.client.tui import run
-            run(client)
+            run(client, endpoints=True) if args.view == 'tls-endpoints' else run(client)
             return 0
-        if args.command == 'list':
+        if args.command == 'tls-endpoints':
+            value = client.tls_endpoints()
+        elif args.command == 'check-tls':
+            value = client.check_tls()
+        elif args.command == 'list':
             value = client.inventory()
         elif args.command in ('import', 'replace'):
             def read_pem(path, limit):
@@ -90,6 +95,15 @@ def main(argv=None):
             value = client.detail(identity) if args.command == 'show' else client.remove(identity)
         if args.json:
             write_json(value, sort_keys=True)
+        elif args.command == 'check-tls':
+            print('TLS check requested' if value['accepted'] else 'No independent TLS endpoints configured')
+        elif args.command == 'tls-endpoints':
+            print('TLS endpoints: %s (%s/%s verified)' % (value['status'], value['verified'], value['total']))
+            for record in value['endpoints']:
+                print('%s  %s  %s:%s\n  SNI: %s\n  SHA-256: %s%s' % (record['name'], record['status'],
+                    record['connect_host'], record['port'], record['server_name'],
+                    record['observed_fingerprint_sha256'] or 'unavailable',
+                    '\n  Error: ' + record['error_code'] if record.get('error_code') else ''))
         elif args.command == 'list':
             ids = short_ids(value)
             for record in value:

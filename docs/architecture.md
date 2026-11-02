@@ -430,3 +430,16 @@ completion protects newer cycles from late writes. Persistence failures do not
 become operation failures, and observations do not interpret cycle return as
 certificate success. See [operations](operations.md) for durability and timing
 limits; this is not distributed execution coordination or a complete audit log.
+
+## Independent endpoint observations
+
+`EndpointPlan` validates static destinations and trust configuration.
+`EndpointProbe` invokes the owned, deadline-bounded TLS subprocess;
+`EndpointObservations` normalizes evidence without certificate storage or command
+ports. `EndpointStore` uses configuration-bound Redis keys with TTL and a
+conditional start-time comparison. `TlsMonitor` is an optional fourth worker;
+shutdown interrupts the probe and refuses to persist an interrupted observation.
+
+The REST read and metrics routes only read evidence. A write-authorized trigger
+coalesces wake requests without accepting destinations. Observation success does
+not change deployment state, and cycle completion is not endpoint verification.

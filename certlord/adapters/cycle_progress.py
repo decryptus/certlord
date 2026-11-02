@@ -48,8 +48,9 @@ def record_value(raw):
 
 
 class CycleProgressStore:
-    def __init__(self, redis, server_id):
+    def __init__(self, redis, server_id, workers=WORKERS):
         self.redis = redis
+        self.workers = tuple(workers)
         self.prefix = 'cycle-progress:' + hashlib.sha256(str(server_id).encode()).hexdigest() + ':'
 
     def connection(self):
@@ -58,7 +59,7 @@ class CycleProgressStore:
         return next(iter(self.redis.servers.values()))['conn']
 
     def key(self, worker):
-        if worker not in WORKERS:
+        if worker not in self.workers:
             raise ValueError('Unknown cycle worker')
         return self.prefix + worker
 
@@ -71,7 +72,7 @@ class CycleProgressStore:
     def read(self):
         connection = self.connection()
         result = {}
-        for worker in WORKERS:
+        for worker in self.workers:
             current, previous = connection.hmget(self.key(worker), 'current', 'previous_instance')
             result[worker] = {'current': record_value(current), 'previous_instance': record_value(previous)}
         return result

@@ -174,7 +174,9 @@ def exercise(source, directory, stack, env, config, config_path, daemon, vault,
         json={'expected_version': recovered['version']}, timeout=5).status_code == 409,
         'Stale retry accepted after replacement')
     phase('replacement-invalidates-all-destination-evidence-and-serves-new-leaf-everywhere')
-    return daemon
+    from tls_endpoints import exercise as endpoint_acceptance
+    return endpoint_acceptance(config, config_path, daemon, restart, api, ports, domain, ca_file,
+        expected, detail, counts, env, phase)
 
 
 if __name__ == '__main__':

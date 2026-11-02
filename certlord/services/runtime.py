@@ -33,6 +33,15 @@ class CertificateRuntime(object):
             modconf.get('process_stop_grace', DEFAULT_PROCESS_STOP_GRACE)))
         self.deployment_targets = plan.targets
         self._redis = pending._redis
+        from certlord.adapters.tls_endpoints import EndpointPlan, EndpointProbe, EndpointStore
+        from certlord.services.tls_endpoints import EndpointObservations
+        self._tls_plan = EndpointPlan(modconf.get('tls_monitoring'))
+        self._tls_stop, self._tls_wake = threading.Event(), threading.Event()
+        self.tls_observations = EndpointObservations(self._tls_plan.targets,
+            EndpointStore(self._redis, config['general']['server_id'], self._tls_plan.stale_after),
+            EndpointProbe(CommandRunner(self._tls_stop, self._tls_plan.timeout,
+                                        modconf.get('process_stop_grace', DEFAULT_PROCESS_STOP_GRACE))),
+            self._tls_plan.stale_after)
         self.evt_deployer, self.evt_tcrawler = threading.Event(), threading.Event()
         self.service = CertificateService(self)
         self._worker_stop_timeout = float(modconf.get('worker_stop_timeout', DEFAULT_WORKER_STOP_TIMEOUT))
@@ -62,6 +71,10 @@ class CertificateRuntime(object):
         self._workers = [SslCertsCertbotHandler(self, self._redis),
                          SslCertsVaultCrawler(self, self._redis, None),
                          SslCertsDeployer(self, self._redis)]
+        if self._tls_plan.targets:
+            from certlord.classes.tls_monitor import TlsMonitor
+            self._workers.append(TlsMonitor(self.tls_observations, self._tls_plan.interval,
+                                           self._tls_stop, self._tls_wake))
         try:
             for worker in self._workers:
                 worker._cycle_tracker = self._cycles
@@ -98,7 +111,7 @@ class CertificateRuntime(object):
             except Exception:
                 dependencies[name] = False
         workers = {worker.name: worker.is_alive() for worker in self._workers}
-        ready = (self._started and not self._stopping and len(workers) == 3
+        ready = (self._started and not self._stopping and len(workers) == 3 + bool(self._tls_plan.targets)
                  and all(workers.values()) and all(dependencies.values()))
         return {'ready': bool(ready), 'phase': self.live()['phase'],
                 'dependencies': dependencies, 'workers': workers}
@@ -109,6 +122,12 @@ class CertificateRuntime(object):
         if self._cycles is not None:
             result['cycles'] = self._cycles.snapshot()
         return result
+
+    def request_tls_check(self):
+        if self._stopping:
+            raise RuntimeError('Certificate runtime is stopping')
+        self._tls_wake.set()
+        return {'accepted': bool(self._tls_plan.targets)}
 
     def _get_auton_cred(self):
         return self._commands._get_auton_cred()

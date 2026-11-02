@@ -16,6 +16,7 @@ from certlord.services.certificates import CertificateBusy, CertificateConflict,
 
 from certlord.services.import_material import InvalidMaterial
 from certlord.services.observations import operations_metrics
+from certlord.services.tls_endpoints import endpoint_metrics
 
 LOG = logging.getLogger(__name__)
 xys.add_callback('ssl_certs.certificate_id', valid_certificate_id)
@@ -87,6 +88,23 @@ class SslCertsModule(DWhoModuleBase):
     def deploy(self, request):
         self._authorize(request, 'deploy')
         return self._call_service(self._service.deploy)
+
+    def tls_endpoints(self, request):
+        self._authorize(request, 'read')
+        return HttpResponseJson(data=self._call_service(self._runtime.tls_observations.snapshot),
+                                headers={'Cache-Control': 'no-store'})
+
+    def tls_endpoint_metrics(self, request):
+        self._authorize(request, 'read')
+        snapshot = self._call_service(self._runtime.tls_observations.snapshot)
+        return HttpResponse(data=self._call_service(endpoint_metrics, snapshot), headers={
+            'Content-type': 'text/plain; version=0.0.4; charset=utf-8', 'Cache-Control': 'no-store'})
+
+    def check_tls_endpoints(self, request):
+        self._authorize(request, 'write')
+        if request.payload_params() not in (None, {}):
+            raise HttpReqErrJson(400, 'TLS probes use configured endpoints only')
+        return self._call_service(self._runtime.request_tls_check)
 
 
     SAVE_PSCHEMA = xys.load("""

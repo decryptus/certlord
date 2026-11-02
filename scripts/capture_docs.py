@@ -40,7 +40,9 @@ RECORDS[0].update(status='generated', deployment=json.loads((ROOT / 'scripts/des
 
 class Fixture(BaseHTTPRequestHandler):
     def do_GET(self):
-        if self.path == '/api/certificates':
+        if self.path == '/api/tls-endpoints':
+            value = json.loads((ROOT / 'scripts/tls-demo.json').read_text())
+        elif self.path == '/api/certificates':
             value = RECORDS
         else:
             value = next((r for r in RECORDS if self.path ==
@@ -111,6 +113,12 @@ def main():
                 stream.feed(('$ certlord ' + ' '.join(argv) + '\r\n').encode())
                 stream.feed(result.stdout.replace(b'\n', b'\r\n') + b'\r\n')
             render(screen, args.output, 'cli-certificates')
+            tls_screen = pyte.Screen(COLS, ROWS)
+            tls_stream = pyte.ByteStream(tls_screen)
+            tls_result = subprocess.run(command + ['tls-endpoints'], env=env, cwd=directory,
+                                        capture_output=True, timeout=10, check=True)
+            tls_stream.feed(b'$ certlord tls-endpoints\r\n' + tls_result.stdout.replace(b'\n', b'\r\n'))
+            render(tls_screen, args.output, 'cli-tls-endpoints')
             machine = subprocess.run(command + ['list', '--json'], env=env, cwd=directory,
                                      capture_output=True, timeout=10, check=True)
             if json.loads(machine.stdout) != RECORDS:
@@ -119,37 +127,42 @@ def main():
                                         capture_output=True, timeout=10)
             if nonterminal.returncode == 0 or b'interactive terminal' not in nonterminal.stderr:
                 raise RuntimeError('TUI must reject noninteractive execution')
-            master, slave = pty.openpty()
-            fcntl.ioctl(slave, termios.TIOCSWINSZ, struct.pack('HHHH', ROWS, COLS, 0, 0))
-            try:
-                process = subprocess.Popen(command + ['tui'], env=env, cwd=directory,
-                                           stdin=slave, stdout=slave, stderr=slave)
-            finally:
-                os.close(slave)
-            screen = pyte.Screen(COLS, ROWS)
-            stream = pyte.ByteStream(screen)
+            for view, prefix, visible, detail_marker in (
+                ([], 'tui', 'shop.example.org', 'UUID: ' + RECORDS[0]['certificate_id']),
+                (['--view', 'tls-endpoints'], 'tui-tls', 'proxy-b', 'TLS name: www.example.org')):
+                master, slave = pty.openpty()
+                fcntl.ioctl(slave, termios.TIOCSWINSZ, struct.pack('HHHH', ROWS, COLS, 0, 0))
+                try:
+                    process = subprocess.Popen(command + ['tui'] + view, env=env, cwd=directory,
+                                               stdin=slave, stdout=slave, stderr=slave)
+                finally:
+                    os.close(slave)
+                screen = pyte.Screen(COLS, ROWS)
+                stream = pyte.ByteStream(screen)
 
-            def wait_for(text):
-                deadline = time.monotonic() + 8
-                while time.monotonic() < deadline:
-                    if select.select([master], [], [], 0.1)[0]:
-                        stream.feed(os.read(master, 65536))
-                    if text in '\n'.join(screen.display):
-                        while select.select([master], [], [], 0.1)[0]:
+                def wait_for(text):
+                    deadline = time.monotonic() + 8
+                    while time.monotonic() < deadline:
+                        if select.select([master], [], [], 0.1)[0]:
                             stream.feed(os.read(master, 65536))
-                        return
-                raise RuntimeError('Missing terminal text: ' + text)
+                        if text in '\n'.join(screen.display):
+                            while select.select([master], [], [], 0.1)[0]:
+                                stream.feed(os.read(master, 65536))
+                            return
+                    raise RuntimeError('Missing terminal text: ' + text)
 
-            wait_for('shop.example.org')
-            render(screen, args.output, 'tui-inventory')
-            os.write(master, b'\n')
-            wait_for('UUID: ' + RECORDS[0]['certificate_id'])
-            render(screen, args.output, 'tui-details')
-            os.write(master, b'q')
-            wait_for('shop.example.org')
-            os.write(master, b'q')
-            if process.wait(timeout=3) != 0:
-                raise RuntimeError('TUI failed')
+                wait_for(visible)
+                render(screen, args.output, prefix + '-inventory')
+                os.write(master, b'\n')
+                wait_for(detail_marker)
+                render(screen, args.output, prefix + '-details')
+                os.write(master, b'q')
+                wait_for(visible)
+                os.write(master, b'q')
+                if process.wait(timeout=3) != 0:
+                    raise RuntimeError('TUI failed')
+                os.close(master)
+                master = None
         metadata = {'data': 'synthetic read-only HTTP fixture; not lifecycle evidence',
                     'version': importlib.metadata.version('certlord') if args.installed
                     else (ROOT / 'VERSION').read_text().strip(),

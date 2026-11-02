@@ -2034,7 +2034,7 @@ path "secret/metadata/certlord-fixture/*" { capabilities = ["list"] }
     require(ready.status_code == 503 and not ready.json()['dependencies']['redis'],
             'Readiness concealed Redis outage')
     require(requests.get(api + '/api/health/live', timeout=5).ok, 'Redis outage changed API liveness')
-    for route in ('/api/operations','/api/operations/metrics'):
+    for route in ('/api/operations','/api/operations/metrics','/api/tls-endpoints','/api/tls-endpoints/metrics'):
         require(requests.get(api + route, timeout=10).status_code == 503,
                 'Operations turned Redis outage into empty success')
     phase('redis-outage-rejected')

@@ -206,3 +206,11 @@ are opt-in and require selector-aware, idempotent Auton jobs. Initial adoption
 deploys to every named target; previous global success is not per-target evidence.
 See [configuration and recovery](docs/multi-destination.md). No automatic data
 conversion, removal of remote certificates or upgrade of existing servers occurs.
+
+# Independent TLS monitoring in 1.2.0
+
+This opt-in feature does not change managed certificate state or deployment.
+Merge the three `/api/tls-endpoints` routes from the supplied configuration into
+existing installations; route configuration is operator-owned and is not replaced
+automatically on upgrade. Configure `modules.ssl_certs.tls_monitoring` and restart.
+See [TLS endpoints](docs/tls-endpoints.md) for permissions and fingerprint rotation.

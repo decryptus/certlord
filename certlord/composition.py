@@ -59,7 +59,9 @@ def certificate_runtime(config, modconf):
     from certlord.services.monitoring import CertificateMonitoring
     from certlord.services.runtime import CertificateRuntime
     from certlord.services.cycle_progress import CycleProgress
-    from certlord.adapters.cycle_progress import CycleProgressStore
+    from certlord.adapters.cycle_progress import CycleProgressStore, WORKERS
+    from certlord.adapters.tls_endpoints import EndpointPlan
+    tls_enabled = bool(EndpointPlan(modconf.get('tls_monitoring')).targets)
     redis = redis_adapter(config, prefix='ssl_certs')
     if len(redis.servers) != 1:
         raise CertLordConfigError('Certificate deployment requires one authoritative Redis server')
@@ -80,4 +82,5 @@ def certificate_runtime(config, modconf):
         checkers[name] = checker
     return CertificateRuntime(config, modconf, store, PendingCertificates(redis),
                               DnsPolicy(modconf), commands, CertificateMonitoring(checkers),
-                              CycleProgress(CycleProgressStore(redis, config['general']['server_id'])))
+                              CycleProgress(CycleProgressStore(redis, config['general']['server_id'],
+                                  WORKERS + (('certlord-tls-monitor',) if tls_enabled else ()))))
