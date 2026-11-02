@@ -16,6 +16,7 @@ include docs/operations.md
 include docs/supervision.md
 include docs/testing.md
 include docs/tls-verification.md
+include docs/multi-destination.md
 include docs/vault-approle.md
 recursive-include assets/brand *.svg *.png *.ico *.webmanifest *.md
 include scripts/build_brand_assets.py

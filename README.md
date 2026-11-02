@@ -9,7 +9,7 @@
 
 TLS certificate lifecycle automation.
 
-Version: **1.0.1 — stable**. See the [release notes](docs/release-notes.md).
+Version: **1.1.0 — release candidate**. See the [release notes](docs/release-notes.md).
 
 CertLord automates TLS certificate issuance, renewal and deployment. It supports
 ACME through Certbot and importing existing PEM certificates, stores certificates
@@ -26,7 +26,7 @@ together, or provision them separately for the [Debian installation](docs/debian
 
 Use the [Compose guide](docs/docker-compose.md) for initialization, persistent
 Vault storage, API access and deployment configuration. The application image is
-`decryptus/certlord:1.0.1`.
+`decryptus/certlord:1.1.0`.
 
 ## Command line and terminal interface
 
@@ -70,6 +70,10 @@ See [MIGRATION.md](MIGRATION.md) before updating an existing installation.
 Guide: [Certificate observations and supervision](docs/supervision.md).
 
 [Post-deployment TLS verification](docs/tls-verification.md) checks configured destinations before acknowledgement.
+
+[Named deployment destinations](docs/multi-destination.md) track each server's
+certificate fingerprint and result, retain partial success through restart, and
+support explicit retries of one failed destination.
 
 [Operations and recovery](docs/operations.md): health, queues, retries and first-version limits.
 

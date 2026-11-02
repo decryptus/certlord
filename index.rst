@@ -13,6 +13,7 @@ Installation, configuration, operation and troubleshooting.
    docs/configuration-validation
    docs/operations
    docs/tls-verification
+   docs/multi-destination
    docs/vault-approle
    docs/acme-connector
    docs/operation-correlation

@@ -1,9 +1,13 @@
 www.example.org
 UUID: 12a45b78-1234-4234-8234-123456789abc
-Status: deployed
-
-
-
+Status: generated
+Destinations: partial (2/3 verified)
+Expected SHA-256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+west: verified
+  Served SHA-256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+east: failed (command_failed)
+north: verified
+  Served SHA-256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
 
 
 

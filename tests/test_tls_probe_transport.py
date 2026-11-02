@@ -26,6 +26,11 @@ def listener(payload):
         class Handler(BaseHTTPRequestHandler):
             def log_message(self,*args):
                 pass
+            def handle(self):
+                try:
+                    super().handle()
+                except (BrokenPipeError, ConnectionResetError):
+                    pass  # TLS probes intentionally close without sending HTTP.
         server = ThreadingHTTPServer(('127.0.0.1',0),Handler)
         server.socket = context.wrap_socket(server.socket,server_side=True)
         thread = threading.Thread(target=server.serve_forever,daemon=True)

@@ -2012,6 +2012,10 @@ path "secret/metadata/certlord-fixture/*" { capabilities = ["list"] }
             == cli_cert.fingerprint(hashes.SHA256()).hex(), 'CLI replacement not served')
     current_meta = requests.get(api + '/api/certificates/' + imported_id, timeout=5).json()
     require(current_meta['renewal_owner'] == 'external', 'Replacement changed renewal ownership')
+    from destinations import exercise as destination_acceptance
+    certlord = destination_acceptance(args.source, directory, stack, env, config, config_path,
+        certlord, vault, api, imported_id, external_domain, replacement_material(40), tls_cert, phase)
+    current_meta = requests.get(api + '/api/certificates/' + imported_id, timeout=5).json()
     require(requests.delete(api + '/api/certificates/' + imported_id, timeout=10).ok, 'Removal before replacement failed')
     require(requests.put(replacement_url, json=dict(cli_material, expected_version=current_meta['version']), timeout=10).status_code == 409,
             'Replacement restored pending deletion')

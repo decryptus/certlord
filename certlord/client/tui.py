@@ -3,6 +3,7 @@ import curses
 from dwho.tui import put, view_details
 from certlord.client.api import ClientError
 from certlord.services.certificate_ids import short_ids
+from certlord.client.presentation import destination_lines
 
 
 def browse(screen, client):
@@ -44,7 +45,8 @@ def browse(screen, client):
             try:
                 record = client.detail(records[selection]['certificate_id'])
                 view_details(screen, ', '.join(record['domains']),
-                             ['UUID: ' + record['certificate_id'], 'Status: ' + record['status']])
+                             ['UUID: ' + record['certificate_id'], 'Status: ' + record['status']]
+                             + destination_lines(record))
             except ClientError as error:
                 message = str(error)
 

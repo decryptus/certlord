@@ -37,6 +37,13 @@ class AutonReceiptTests(unittest.TestCase):
         self.assertEqual(receipt, dict(self.target, uid='deploy:' + self.identity, status='complete', return_code=0))
         self.assertNotIn('synthetic-secret', repr(notify.call_args_list))
 
+    def test_restart_starts_with_read_only_status_of_persisted_identity(self):
+        with patch('certlord.adapters.auton_receipt.CommandRunner') as factory:
+            factory.return_value.run.return_value = self.response()
+            code, receipt = run_receipted(self.runner, self.command, self.identity, Mock(), initial_mode='status')
+        self.assertEqual(factory.return_value.run.call_args.args[0][-3:], ['status', '--uid', self.identity])
+        self.assertEqual(code, 0)
+
     def test_mismatched_or_malformed_receipts_never_resubmit(self):
         for response in [(0, b'not json', b''), self.response(uid='other:' + self.identity),
                          self.response(return_code=False), self.response(code=201),

@@ -24,6 +24,8 @@ RECORDS = [
      'domains': ['shop.example.org'], 'status': 'processing'},
 ]
 
+RECORDS[0].update(status='generated', deployment=json.loads((ROOT / 'scripts/destination-demo.json').read_text()))
+
 
 class DemoClient:
     def inventory(self):

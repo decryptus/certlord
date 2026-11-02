@@ -15,6 +15,7 @@ from certlord.classes.config import STATUS_CREATE, STATUS_GENERATED, STATUS_DEPL
 from certlord.classes.certbot_handler import SslCertsCertbotHandler
 from certlord.classes.vault_crawler import SslCertsVaultCrawler
 from certlord.classes.deployer import SslCertsDeployer
+from certlord.services.deployment import complete, certificate_generation
 
 class CertificateRuntime(object):
     def __init__(self, config, modconf, store, pending, dns_policy, commands, monitoring, cycles=None):
@@ -24,6 +25,13 @@ class CertificateRuntime(object):
         self._store, self._pending = store, pending
         self.reserve_identity = store.reserve_identity
         self._commands, self._monitoring = commands, monitoring
+        from certlord.adapters.destinations import DestinationPlan
+        from certlord.adapters.processes import CommandRunner
+        from certlord.classes.config import DEFAULT_COMMAND_TIMEOUT, DEFAULT_PROCESS_STOP_GRACE
+        plan = DestinationPlan(config, modconf, threading.Event(), CommandRunner(
+            threading.Event(), modconf.get('command_timeout', DEFAULT_COMMAND_TIMEOUT),
+            modconf.get('process_stop_grace', DEFAULT_PROCESS_STOP_GRACE)))
+        self.deployment_targets = plan.targets
         self._redis = pending._redis
         self.evt_deployer, self.evt_tcrawler = threading.Event(), threading.Event()
         self.service = CertificateService(self)
@@ -170,6 +178,7 @@ class CertificateRuntime(object):
         payload.pop('deployment_receipt', None)
         stamp(payload, force_new=True)
         payload.pop('verification', None)
+        payload.pop('deployment', None)
         payload.update(status=STATUS_GENERATED, origin='external', renewal_owner='external',
                        vendor='external', updated_at=datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S+00:00"))
         self._store.replace_if_version(certificate_id, domain, version, payload)
@@ -178,6 +187,18 @@ class CertificateRuntime(object):
     def record_verification(self, certificate_id, domain, snapshot, verification):
         data, version = snapshot
         payload = dict(data, verification=dict(verification))
+        self._store.replace_if_version(certificate_id, domain, version, payload)
+
+    def write_deployment(self, certificate_id, domain, snapshot, state):
+        data, version = snapshot
+        if (state['generation'] != certificate_generation(data)
+                or data.get('status') not in (STATUS_GENERATED, STATUS_DEPLOYED, '', None)):
+            from certlord.ports.certificates import StorageConflict
+            raise StorageConflict('Certificate no longer deployable')
+        payload = dict(data, deployment=state,
+                       status=STATUS_DEPLOYED if complete(state) else STATUS_GENERATED)
+        payload.pop('verification', None)
+        payload.pop('deployment_receipt', None)
         self._store.replace_if_version(certificate_id, domain, version, payload)
 
     def mark_deployed(self, certificate_id, domain, snapshot, verification=None, receipt=None):
@@ -222,6 +243,7 @@ class CertificateRuntime(object):
             cert.pop('issuance_complete', None)
             cert.pop('verification', None)
             cert.pop('deployment_receipt', None)
+            cert.pop('deployment', None)
             cert['status'] = STATUS_GENERATED
             self._create_certificate(certificate_id, domain, data = cert)
             return True

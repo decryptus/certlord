@@ -1,0 +1,30 @@
+{
+  "status": "partial",
+  "verified": 2,
+  "total": 3,
+  "expected_fingerprint_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "destinations": [
+    {
+      "name": "west",
+      "status": "verified",
+      "error_code": null,
+      "verification": {
+        "observed_fingerprint_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+    },
+    {
+      "name": "east",
+      "status": "failed",
+      "error_code": "command_failed",
+      "verification": null
+    },
+    {
+      "name": "north",
+      "status": "verified",
+      "error_code": null,
+      "verification": {
+        "observed_fingerprint_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+    }
+  ]
+}
