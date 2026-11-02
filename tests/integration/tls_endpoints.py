@@ -18,7 +18,13 @@ def exercise(config, config_path, daemon, restart, api, ports, domain, ca_file,
         'wrong-name': dict(base, server_name='wrong.example.test'),
         'untrusted': {key: value for key, value in base.items() if key != 'ca_file'}}
     monitoring = {'interval': 300, 'timeout': 3, 'endpoints': definitions}
-    config['modules']['ssl_certs']['tls_monitoring'] = monitoring
+    module = config['modules']['ssl_certs']
+    module['tls_monitoring'] = monitoring
+    # Earlier deployment phases explicitly run cycles with startup disabled.
+    # This phase exercises the production scheduler and its optional fourth worker.
+    module['routes']['index'].update(at_start=True, at_stop=True)
+    module.update(renew_before_expiry=1, certbot_check_interval=300,
+                  vault_check_interval=300, deployer_check_interval=300)
     write_yaml(Path(config_path), config)
     before, jobs = detail(), counts()
     daemon = restart(daemon)
