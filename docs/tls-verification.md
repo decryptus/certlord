@@ -6,6 +6,11 @@ leaf fingerprint match before acknowledging a configured destination.
 
 ## Explicit destinations
 
+This page describes the compatible **legacy single-target mode**. For independent
+jobs, results and retries on several servers, use
+[named deployment destinations](multi-destination.md). The two modes cannot be
+combined for the same certificate UUID.
+
 Configure one destination per server-generated certificate UUID under
 `modules.ssl_certs` (use `certlord show DOMAIN --json` to obtain the UUID):
 

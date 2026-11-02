@@ -1,4 +1,21 @@
-# CertLord 1.0.1
+# CertLord 1.1.0
+
+Named deployment destinations add per-server Auton jobs, exact leaf TLS checks,
+persistent progress and partial-failure reporting. Successful destinations are
+preserved on retry; an interrupted submission resumes the same remote job's
+status. A failed target can be retried with an exact record version. Uncertain
+jobs require explicit acknowledgement before requesting a new attempt.
+
+Configuration is opt-in. Existing global command and single-target TLS behavior
+remain supported. New material invalidates all old target results. See
+[named destinations](multi-destination.md) for configuration, the required
+idempotent job contract, migration and recovery limits.
+
+Install `certlord==1.1.0` or use `decryptus/certlord:1.1.0` after publication.
+Preserve configuration, Vault/Redis data and credentials and restart deliberately.
+No existing server is upgraded automatically.
+
+## CertLord 1.0.1
 
 This maintenance release bounds combined command stdout/stderr to 4 MiB and
 raises an explicit failure when output exceeds that budget. Truncated command

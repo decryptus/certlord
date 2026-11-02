@@ -5,8 +5,8 @@ import sys
 from dwho.cli import require_terminal, write_json
 from certlord.client.api import CertificateClient, ClientError
 from certlord.services.certificate_ids import resolve_certificate, short_ids
-
-COMMANDS = ('list', 'show', 'create', 'remove', 'import', 'replace', 'tui')
+from certlord.client.presentation import destination_lines
+from certlord.client import COMMANDS
 
 
 def parser():
@@ -23,12 +23,16 @@ def parser():
             sub.add_argument('--json', action='store_true', help='Full UUIDs, machine-readable output')
         if command == 'list':
             sub.add_argument('--full-id', action='store_true')
-        if command in ('show', 'remove', 'replace'):
+        if command in ('show', 'remove', 'replace', 'retry-destination'):
             sub.add_argument('selector', help='Domain, full UUID or unambiguous UUID prefix (8+ characters)')
         if command in ('create', 'import'):
             sub.add_argument('domain')
-        if command == 'replace':
+        if command in ('replace', 'retry-destination'):
             sub.add_argument('--expected-version', type=int, required=True, help='Version read from certlord show --json')
+        if command == 'retry-destination':
+            sub.add_argument('destination')
+            sub.add_argument('--acknowledge-uncertain', action='store_true',
+                             help='Accept that the previous remote job may still run; requires an idempotent job')
         if command in ('import', 'replace'):
             sub.add_argument('--cert-file', required=True)
             sub.add_argument('--key-file', required=True)
@@ -75,6 +79,12 @@ def main(argv=None):
                 value = client.import_certificate(args.domain, *material)
         elif args.command == 'create':
             value = client.create(args.domain)
+        elif args.command == 'retry-destination':
+            if args.expected_version <= 0:
+                raise ValueError('Expected version must be positive')
+            identity = resolve_certificate(args.selector, client.inventory())
+            value = client.retry_destination(identity, args.destination, args.expected_version,
+                                             args.acknowledge_uncertain)
         else:
             identity = resolve_certificate(args.selector, client.inventory())
             value = client.detail(identity) if args.command == 'show' else client.remove(identity)
@@ -90,6 +100,8 @@ def main(argv=None):
         else:
             suffix = '  version=%s' % value['version'] if 'version' in value else ''
             print('%s  %s  %s%s' % (value['certificate_id'], ', '.join(value['domains']), value['status'], suffix))
+            for line in destination_lines(value):
+                print(line)
         return 0
     except (ClientError, ValueError) as error:
         print('certlord: %s' % error, file=sys.stderr)

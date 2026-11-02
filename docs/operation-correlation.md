@@ -60,6 +60,10 @@ new credential, new distributed lock or exactly-once guarantee.
 
 ## Confirmed Auton receipts (opt-in)
 
+The following describes the legacy global command. The
+[named destination mode](multi-destination.md) persists each submission intent
+and resumes status reads for its recorded job after restart.
+
 Set `modules.ssl_certs.auton.receipt_mode: true` to use the structured single-job
 `auton --mode run/status` contract (tested with Auton 1.2.1). Default `false`
 retains the existing configurable command behavior. This mode accepts one plain

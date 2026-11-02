@@ -199,3 +199,10 @@ Add the four authenticated GET routes in [the runbook](docs/operations.md).
 No stored-state migration is required. API-only fixtures report live but not ready;
 readiness requires a started scheduler and reachable Vault/Redis. The optional
 `operation_scan_limit` caps unique observed items and defaults to 10000.
+# Named destinations in 1.1.0
+
+The existing global deployment configuration remains supported. Named destinations
+are opt-in and require selector-aware, idempotent Auton jobs. Initial adoption
+deploys to every named target; previous global success is not per-target evidence.
+See [configuration and recovery](docs/multi-destination.md). No automatic data
+conversion, removal of remote certificates or upgrade of existing servers occurs.

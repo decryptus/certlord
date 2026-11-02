@@ -24,7 +24,7 @@ import pyte
 from PIL import Image, ImageDraw, ImageFont
 
 ROOT = Path(__file__).resolve().parents[1]
-COLS, ROWS = 100, 12
+COLS, ROWS = 100, 16
 FONT = '/usr/share/fonts/truetype/dejavu/DejaVuSansMono.ttf'
 RECORDS = [
     {'certificate_id': '12a45b78-1234-4234-8234-123456789abc',
@@ -34,6 +34,8 @@ RECORDS = [
     {'certificate_id': '56e78f12-1234-4234-8234-123456789abc',
      'domains': ['shop.example.org'], 'status': 'processing'},
 ]
+
+RECORDS[0].update(status='generated', deployment=json.loads((ROOT / 'scripts/destination-demo.json').read_text()))
 
 
 class Fixture(BaseHTTPRequestHandler):

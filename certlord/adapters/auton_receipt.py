@@ -25,11 +25,13 @@ def receipt_target(uri, endpoint, args):
     return {'origin': uri.rstrip('/'), 'endpoint': endpoint}
 
 
-def run_receipted(runner, command, attempt_id, notify):
+def run_receipted(runner, command, attempt_id, notify, initial_mode='run'):
     target = command['receipt_target']
     expected = target['endpoint'] + ':' + attempt_id
     deadline = time.monotonic() + runner.timeout
-    mode = 'run'
+    if initial_mode not in ('run', 'status'):
+        raise ValueError('Invalid Auton receipt mode')
+    mode = initial_mode
     observed_state = None
     while True:
         remaining = deadline - time.monotonic()
@@ -57,6 +59,8 @@ def run_receipted(runner, command, attempt_id, notify):
             raise InvalidReceipt('Auton returned no valid matching job receipt') from None
         # Metadata is constructed from trusted target and matching response identity.
         receipt = dict(target, uid=expected, status=result['status'], return_code=return_code)
+        if result.get('execution_uncertain') or result.get('outcome') in ('job.interrupted', 'job.cancelled'):
+            receipt['execution_uncertain'] = True
         if receipt['status'] != observed_state:
             notify(receipt)
             observed_state = receipt['status']

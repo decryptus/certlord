@@ -5,7 +5,15 @@ from dwho.tui.textual import DetailPanel, ServiceDashboard, TableRow
 from textual.widgets import DataTable
 
 from certlord.client.api import ClientError
+from certlord.client.presentation import destination_lines
 from certlord.services.certificate_ids import short_ids
+
+
+def detail_text(record):
+    lines = destination_lines(record)
+    if lines:
+        return '\n'.join(['Status: ' + record['status']] + lines) + '\n\n' + json.dumps(record, indent=2)
+    return json.dumps(record, indent=2)
 
 
 class CertificateApp(ServiceDashboard):
@@ -33,7 +41,7 @@ class CertificateApp(ServiceDashboard):
         self.records = {record['certificate_id']: record for record in records}
         self.display_rows([TableRow(record['certificate_id'],
             (', '.join(record['domains']), record['status'], ids[record['certificate_id']]),
-            ', '.join(record['domains']), json.dumps(record, indent=2)) for record in records])
+            ', '.join(record['domains']), detail_text(record)) for record in records])
         self.set_notice('info', '%s managed certificates' % len(records))
         self.set_activity('Enter reads certificate details. Inventory and detail reads do not issue or remove certificates.')
 
@@ -44,7 +52,7 @@ class CertificateApp(ServiceDashboard):
         self.perform(lambda: self.client.detail(identity), self.detail_loaded, self.failure)
 
     def detail_loaded(self, record):
-        self.query_one(DetailPanel).show_details(', '.join(record['domains']), json.dumps(record, indent=2))
+        self.query_one(DetailPanel).show_details(', '.join(record['domains']), detail_text(record))
         self.set_notice('info', 'Certificate details loaded.')
 
 

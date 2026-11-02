@@ -35,8 +35,9 @@ MODULE_SCHEMA = xys.load('''
 auton?: %s
 certbot?: %s
 tls_verification?: %s
+deployment_destinations?: %s
 allow_dns_resolv?: %s
-''' % (MAPPING, MAPPING, MAPPING, MAPPING))
+''' % (MAPPING, MAPPING, MAPPING, MAPPING, MAPPING))
 
 
 def validate_configuration(conf):

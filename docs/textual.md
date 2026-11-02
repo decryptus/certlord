@@ -10,6 +10,9 @@ Install the optional extra with `pip install "certlord[textual]"`.
 Run `certlord tui --ui textual`. Search the managed certificate inventory,
 press Enter to read a certificate, and r to refresh. This browser is read-only;
 issuing, importing, replacing and removing certificates remain CLI/API operations.
+Named destination details show partial progress, per-target errors and
+expected/served SHA-256 fingerprints above the full metadata. Scroll the detail
+panel to inspect every target. Targeted retries remain explicit CLI/API actions.
 Failed reads leave the previous inventory visibly marked as stale.
 
 Use / to search, Escape to cancel dialogs and q to quit. Requests run off the

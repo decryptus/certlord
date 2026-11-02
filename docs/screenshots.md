@@ -1,6 +1,6 @@
 # CLI and terminal browser
 
-These captures run the real CertLord 1.0.1 client against a read-only HTTP
+These captures run the real CertLord 1.1.0 client against a read-only HTTP
 fixture on loopback. Domains, UUIDs and statuses are synthetic demonstration data.
 They illustrate the interface, not successful issuance or deployment. No Vault,
 Redis, private keys, credentials or production hosts are involved.
@@ -27,7 +27,9 @@ certificates. [Text transcript](images/tui-inventory.txt).
 
 ![TUI detail with full UUID and status](images/tui-details.png)
 
-The current detail screen shows the domain, full UUID and status. `q` returns to
+The detail screen shows the domain, full UUID and status. Named destinations
+include partial progress, errors and expected/served SHA-256 fingerprints.
+The synthetic example deliberately shows two verified targets and one failure. `q` returns to
 the list. `deployed` is a lifecycle status, not by itself proof of a current TLS
 check; see [destination verification](tls-verification.md).
 [Text transcript](images/tui-details.txt).

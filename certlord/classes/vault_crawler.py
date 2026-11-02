@@ -14,6 +14,7 @@ from OpenSSL import crypto
 
 from certlord.ports.certificates import StorageNotFound
 from certlord.adapters.deployment_queue import DeploymentQueue
+from certlord.services.deployment import complete, destination_state
 import six
 
 from certlord.classes.config import (DEFAULT_VAULT_CHECK_INTERVAL,
@@ -113,7 +114,11 @@ class SslCertsVaultCrawler(threading.Thread):
                     if cert.get('cert') and cert.get('key'):
                         acerts.set_dom_status(domain, STATUS_EXISTS)
 
-                        if cert.get('status') in (STATUS_GENERATED, "", None):
+                        targets = getattr(self._module, 'deployment_targets', {})
+                        changed_plan = (isinstance(targets, dict) and certificate_id in targets
+                                        and not complete(destination_state(cert, targets[certificate_id])))
+                        if cert.get('status') in (STATUS_GENERATED, "", None) or (
+                                cert.get('status') == STATUS_DEPLOYED and changed_plan):
                             to_deploy = self._set_to_deploy(certificate_id, domain, cert)
                             acerts.rem_dom(domain)
                             continue

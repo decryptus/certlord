@@ -204,6 +204,14 @@ class SslCertsModule(DWhoModuleBase):
             raise HttpReqErrJson(400, 'Invalid certificate UUID')
         return self._call_service(self._service.replace_import, params['certificate_id'], request.payload_params())
 
+    def retry_destination(self, request):
+        self._authorize(request, 'deploy')
+        params = request.query_params() or {}
+        if not isinstance(params, dict) or not valid_certificate_id(params.get('certificate_id')):
+            raise HttpReqErrJson(400, 'Invalid certificate UUID')
+        return self._call_service(self._service.retry_destination, params['certificate_id'],
+                                  params.get('destination'), request.payload_params())
+
     def remove(self, request):
         self._authorize(request, 'write')
         params = request.query_params() or {}

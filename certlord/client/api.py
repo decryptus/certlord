@@ -69,3 +69,10 @@ class CertificateClient:
     def replace_import(self, certificate_id, expected_version, cert, key, chain=''):
         return self.request('PUT', '/api/certificates/' + certificate_id + '/material',
                             {'expected_version': expected_version, 'cert': cert, 'key': key, 'chain': chain})
+
+    def retry_destination(self, certificate_id, destination, expected_version, acknowledge_uncertain=False):
+        from certlord.services.deployment import DESTINATION_NAME
+        if not isinstance(destination, str) or not DESTINATION_NAME.fullmatch(destination):
+            raise ValueError('Invalid destination name')
+        return self.request('POST', '/api/certificates/' + certificate_id + '/destinations/' + destination + '/retry',
+                            {'expected_version': expected_version, 'acknowledge_uncertain': acknowledge_uncertain})

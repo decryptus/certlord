@@ -12,6 +12,7 @@ import secrets
 from uuid import uuid4
 from certlord.services.identity_definition import identity_definition, identity_fingerprint
 from certlord.services.import_material import validate_import, InvalidMaterial
+from certlord.services.deployment import deployment_metadata, destination_state, DESTINATION_NAME
 
 from certlord.ports.certificates import StorageConflict, StorageNotFound
 
@@ -73,6 +74,44 @@ class CertificateService(object):
     def deploy(self):
         with self._lock():
             self.backend.evt_tcrawler.set()
+
+    @tracked('retry_destination')
+    def retry_destination(self, certificate_id, destination, payload):
+        certificate_id = require_certificate_id(certificate_id)
+        if (not isinstance(destination, str) or not DESTINATION_NAME.fullmatch(destination)
+                or not isinstance(payload, dict)
+                or set(payload) - {'expected_version', 'acknowledge_uncertain'}
+                or type(payload.get('expected_version')) is not int or payload['expected_version'] <= 0
+                or type(payload.get('acknowledge_uncertain', False)) is not bool):
+            raise InvalidMaterial('Destination retry requires a name and positive expected_version')
+        targets = getattr(self.backend, 'deployment_targets', {})
+        if not isinstance(targets, dict) or destination not in targets.get(certificate_id, {}):
+            raise CertificateNotFound('Destination not configured')
+        with self._lock(certificate_id=certificate_id):
+            domains = self.backend.bound_domains(certificate_id)
+            if len(domains) != 1:
+                raise CertificateNotFound('Certificate not found')
+            domain = domains[0]
+            try:
+                snapshot = self.backend.certificate_snapshot(certificate_id, domain)
+                record, version = snapshot
+                if version != payload['expected_version'] or record.get('status') != STATUS_GENERATED:
+                    raise CertificateConflict('Certificate changed or is not pending deployment')
+                state = destination_state(record, targets[certificate_id])
+                entry = state['destinations'][destination]
+                if entry['status'] not in ('failed', 'uncertain', 'submitting'):
+                    raise CertificateConflict('Only failed or uncertain destinations may be retried')
+                if entry['status'] != 'failed' and not payload.get('acknowledge_uncertain'):
+                    raise CertificateConflict('Uncertain job may still run; explicit acknowledgement required')
+                state['destinations'][destination] = {'status': 'pending', 'target_sha256': entry['target_sha256']}
+                self.backend.write_deployment(certificate_id, domain, snapshot, state)
+            except StorageNotFound:
+                raise CertificateNotFound('Certificate not found') from None
+            except StorageConflict:
+                raise CertificateConflict('Destination changed; read current metadata before retry') from None
+            finally:
+                self.backend.evt_tcrawler.set()
+        return self.detail(certificate_id)
 
     def validate(self, domain):
         with self._lock():
@@ -309,10 +348,12 @@ class CertificateService(object):
             if len(domains) != 1:
                 raise CertificateConflict('Certificate identity has multiple domains; repair storage')
             record = self.backend.get_certificate(certificate_id, domains[0])
+            targets = getattr(self.backend, 'deployment_targets', {})
+            multi = isinstance(targets, dict) and certificate_id in targets
             result = {'certificate_id': certificate_id, 'domains': domains,
                       'status': record.get('status') or STATUS_PROCESSING,
                       'verification': verification_metadata(record)}
-            if record.get('origin') == 'external':
+            if record.get('origin') == 'external' or multi:
                 try:
                     record, version = self.backend.certificate_snapshot(certificate_id, domains[0])
                 except StorageNotFound:
@@ -322,6 +363,8 @@ class CertificateService(object):
                 result['verification'] = verification_metadata(record)
                 result.update({name: record.get(name) for name in
                                ('origin', 'renewal_owner', 'fingerprint_sha256', 'not_after')})
+            if multi:
+                result['deployment'] = deployment_metadata(record, targets[certificate_id])
             if record_id(record):
                 result['operation_id'] = record_id(record)
             return result

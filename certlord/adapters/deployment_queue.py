@@ -6,11 +6,7 @@ from certlord.services.certificate_ids import require_certificate_id
 import json
 import time
 from six import iteritems
-
-
-def certificate_generation(certificate):
-    material = [certificate.get('cert', ''), certificate.get('chain', '')]
-    return hashlib.sha256(json.dumps(material, separators=(',', ':')).encode('utf-8')).hexdigest()
+from certlord.services.deployment import certificate_generation
 
 
 class DeploymentQueue(object):

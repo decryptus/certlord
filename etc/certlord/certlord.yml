@@ -147,6 +147,10 @@ modules:
         handler:   'replace_import'
         regexp:    '^api/certificates/(?P<certificate_id>[0-9a-f-]{36})/material/?$'
         op:        'PUT'
+      retry_destination:
+        handler: retry_destination
+        regexp: '^api/certificates/(?P<certificate_id>[0-9a-f-]{36})/destinations/(?P<destination>[a-z][a-z0-9_-]{0,63})/retry/?$'
+        op: POST
       import_certificate:
         handler:   'import_certificate'
         name:      'api/certificates/import'

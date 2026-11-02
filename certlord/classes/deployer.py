@@ -18,6 +18,8 @@ from certlord.adapters.processes import CommandRunner, CommandInterrupted
 from certlord.adapters.tls_verification import TlsVerifier
 from certlord.adapters.deployment_queue import DeploymentQueue, certificate_generation
 from certlord.adapters.deployment_lease import DeploymentLease, LeaseLost
+from certlord.adapters.destinations import DestinationPlan
+from certlord.services.deployment import DestinationDeployment
 from certlord.ports.certificates import StorageConflict, StorageError, StorageNotFound
 from certlord.classes.config import (DEFAULT_COMMAND_TIMEOUT, DEFAULT_PROCESS_STOP_GRACE,
                                     DEFAULT_DEPLOYER_CHECK_INTERVAL, DEFAULT_DEPLOY_LEASE_MARGIN,
@@ -44,8 +46,11 @@ class SslCertsDeployer(threading.Thread):
             float(self._modconf.get('process_stop_grace', DEFAULT_PROCESS_STOP_GRACE)))
 
         self._verifier = TlsVerifier(self._modconf.get('tls_verification'), self._stop_event, self._runner.grace)
+        self._destinations = DestinationPlan(module.config, self._modconf, self._stop_event, self._runner)
         self._lease = DeploymentLease(redis, self._server_id,
-            max(self._runner.timeout, self._verifier.runner.timeout if self._verifier.targets else 0) + 3 * self._runner.grace + DEFAULT_DEPLOY_LEASE_MARGIN)
+            max([self._runner.timeout, self._verifier.runner.timeout if self._verifier.targets else 0]
+                + [v.runner.timeout for v in self._destinations.verifiers.values()])
+            + 3 * self._runner.grace + DEFAULT_DEPLOY_LEASE_MARGIN)
         self.killed         = False
         self.check_interval = self._modconf.get('deployer_check_interval') or DEFAULT_DEPLOYER_CHECK_INTERVAL
 
@@ -78,6 +83,29 @@ class SslCertsDeployer(threading.Thread):
                         if data.get('status') in (STATUS_GENERATED, '', None) and data.get('cert') and data.get('key'):
                             self._queue.enqueue(self._server_id, obj['certificate_id'], obj['domain'], data)
                         self._lease.acknowledge(self._server_id, key)
+                        continue
+                    if obj['certificate_id'] in self._destinations.targets:
+                        if data.get('status') not in (STATUS_GENERATED, STATUS_DEPLOYED, '', None):
+                            self._lease.acknowledge(self._server_id, key)
+                            continue
+                        if not data.get('cert') or not data.get('key'):
+                            raise StorageError('Cannot deploy incomplete certificate material')
+                        def guard():
+                            if self.killed or not self._lease.renew():
+                                raise LeaseLost('Destination deployment interrupted or lease lost')
+                        engine = DestinationDeployment(self._module.certificate_snapshot,
+                            self._module.write_deployment, self._destinations.command,
+                            self._destinations.verify, guard)
+                        try:
+                            done = engine.run(obj['certificate_id'], obj['domain'], snapshot,
+                                              self._destinations.targets[obj['certificate_id']])
+                        except StorageConflict:
+                            LOG.warning('Certificate changed during destination deployment; work retained')
+                            continue
+                        if done:
+                            guard()
+                            self._lease.acknowledge(self._server_id, key)
+                            self._module.create_ssl_check(obj['domain'])
                         continue
                     if data.get('status') not in (STATUS_GENERATED, '', None):
                         self._lease.acknowledge(self._server_id, key)
