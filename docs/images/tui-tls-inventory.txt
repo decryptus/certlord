@@ -1,0 +1,3 @@
+CertLord | Enter: details | r: refresh | q: quit
+web-a  verified  www.example.org
+proxy-b  stale  www.example.org

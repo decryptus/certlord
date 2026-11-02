@@ -87,6 +87,18 @@ modules:
       #     host: 192.0.2.10
       #     port: 443
       #     ca_file: /etc/certlord/trusted-ca.pem  # omit for system roots
+    # Independent observations; no certificate UUID or deployment job required.
+    tls_monitoring:
+      timeout: 10
+      interval: 300
+      endpoints: {}
+      # endpoints:
+      #   web-a:
+      #     host: 192.0.2.10
+      #     server_name: www.example.org
+      #     port: 443
+      #     ca_file: /etc/certlord/trusted-ca.pem  # omit for system roots
+      #     expected_fingerprint_sha256: <64 lowercase hex characters>  # optional
     # Shared budget per DNS policy check (CAA ancestors share one budget).
     dns_timeout: 5
     certbot_check_interval: 5
@@ -115,6 +127,18 @@ modules:
         handler: live
         name: api/health/live
         op: GET
+      tls_endpoints:
+        handler: tls_endpoints
+        name: api/tls-endpoints
+        op: GET
+      tls_endpoint_metrics:
+        handler: tls_endpoint_metrics
+        name: api/tls-endpoints/metrics
+        op: GET
+      check_tls_endpoints:
+        handler: check_tls_endpoints
+        name: api/tls-endpoints/check
+        op: POST
       ready:
         handler: ready
         name: api/health/ready

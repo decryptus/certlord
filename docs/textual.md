@@ -24,3 +24,13 @@ available with `--ui curses`. Synthetic demonstrations are not production eviden
 ![Synthetic Textual textual-inventory](images/textual-inventory.png)
 
 ![Synthetic Textual textual-details](images/textual-details.png)
+
+## Independent TLS endpoints
+
+Open `certlord tui --ui textual --view tls-endpoints` for the separate read-only
+view. Enter shows connection address, TLS name, freshness, errors and expected/served
+fingerprints. Refresh reloads stored observations; it never deploys or launches
+checks. Unlike the managed inventory, an unavailable read clears the endpoint rows
+to avoid presenting old TLS results as current.
+
+![Synthetic independent TLS endpoints, including a stale observation](images/textual-tls-endpoints.png)

@@ -53,6 +53,12 @@ class CertificateClient:
             raise ClientError('Invalid certificate inventory')
         return records
 
+    def tls_endpoints(self):
+        return self.request('GET', '/api/tls-endpoints')
+
+    def check_tls(self):
+        return self.request('POST', '/api/tls-endpoints/check', {})
+
     def detail(self, certificate_id):
         return self.request('GET', '/api/certificates/' + certificate_id)
 

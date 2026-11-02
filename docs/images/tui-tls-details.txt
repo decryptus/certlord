@@ -1,0 +1,16 @@
+web-a
+Status: verified
+Connection: 192.0.2.10:443
+TLS name: www.example.org
+Fresh: True
+Last check (Unix seconds): 1793610390
+Last result: verified
+Expected SHA-256: not pinned
+Served SHA-256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+Error: none
+
+
+
+
+
+Up/Down to scroll; q or Escape to return

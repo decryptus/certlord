@@ -1,6 +1,6 @@
 # CLI and terminal browser
 
-These captures run the real CertLord 1.1.0 client against a read-only HTTP
+These captures run the real CertLord 1.2.0 client against a read-only HTTP
 fixture on loopback. Domains, UUIDs and statuses are synthetic demonstration data.
 They illustrate the interface, not successful issuance or deployment. No Vault,
 Redis, private keys, credentials or production hosts are involved.
@@ -41,3 +41,18 @@ For capture generation and maintenance, see the
 
 The [Textual guide](textual.md) shows the current optional browser with synthetic fixtures.
 The curses captures above document the compatibility interface.
+
+## Independent TLS observations
+
+![Synthetic TLS observations with one verified and one stale endpoint](images/cli-tls-endpoints.png)
+
+`certlord tls-endpoints` shows configured connection addresses, TLS names and
+served SHA-256 fingerprints. The stale example retains its historical fingerprint
+but is excluded from the verified count. [Text transcript](images/cli-tls-endpoints.txt).
+See [independent TLS monitoring](tls-endpoints.md) for freshness and configuration.
+
+![Synthetic curses TLS endpoint details](images/tui-tls-details.png)
+
+The compatibility browser supports the same read-only view with
+`certlord tui --view tls-endpoints`. [Inventory transcript](images/tui-tls-inventory.txt)
+and [detail transcript](images/tui-tls-details.txt).

@@ -158,7 +158,7 @@ class ProcessTests(unittest.TestCase):
 
     def test_runtime_signals_all_workers_before_joining(self):
         from certlord.services.runtime import CertificateRuntime
-        runtime = CertificateRuntime({'general': {'lock_timeout': 1}}, {},
+        runtime = CertificateRuntime({'general': {'lock_timeout': 1, 'server_id': 'fixture'}}, {},
             Mock(), Mock(), Mock(), Mock(), Mock())
         events = []
         workers = [Mock(name='first'), Mock(name='second')]

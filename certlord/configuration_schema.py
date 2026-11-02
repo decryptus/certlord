@@ -36,8 +36,9 @@ auton?: %s
 certbot?: %s
 tls_verification?: %s
 deployment_destinations?: %s
+tls_monitoring?: %s
 allow_dns_resolv?: %s
-''' % (MAPPING, MAPPING, MAPPING, MAPPING, MAPPING))
+''' % (MAPPING, MAPPING, MAPPING, MAPPING, MAPPING, MAPPING))
 
 
 def validate_configuration(conf):

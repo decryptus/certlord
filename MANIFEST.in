@@ -24,7 +24,7 @@ include docs/release-notes.md
 include docs/screenshots.md docs/rc-evaluation.md
 recursive-include docs/images *.png *.txt *.json
 include scripts/capture_docs.py scripts/requirements-docs.txt
-include scripts/destination-demo.json
+include scripts/destination-demo.json scripts/tls-demo.json
 include DOCKERHUB.md
 
 include docs/textual.md

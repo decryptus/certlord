@@ -2,6 +2,16 @@
 
 Updated: 2026-11-02. Published stable release: 1.1.0.
 
+## In progress — 1.2.0
+
+Independent TLS checks of configured endpoints: web servers, reverse proxies,
+load balancers and CDNs. CDN is one example, not a provider requirement.
+
+- Implemented locally: explicit connection address and TLS name, optional exact
+  fingerprint, bounded worker, durable observations, freshness, API/CLI/TUI and metrics.
+- Validation and release synchronization are in progress; not yet published.
+- No public certificate or provider account is required for the local fixtures.
+
 ## Delivered — 1.1.0
 
 Named certificate deployment destinations ([issue #10](https://github.com/decryptus/certlord/issues/10)):
@@ -41,8 +51,6 @@ No public or production certificates are required for these synthetic tests.
 
 ## Later work
 
-- Independent multi-CDN TLS checks, separate from deployment targets, with
-  explicit connection endpoint, customer SNI and optional exact fingerprint.
 - Provider-specific deployment connectors, starting with AWS/CloudFront after
   permissions, region and propagation requirements are qualified.
 - External geographic monitoring where provider capabilities permit it; local

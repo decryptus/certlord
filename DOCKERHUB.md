@@ -17,6 +17,16 @@ to initialize Vault and configure your ACME contact, authentication and destinat
 jobs before starting the services. The supplied stack starts with Let's Encrypt
 staging. Keep persistent volumes and securely retain the Vault unseal material.
 
+## Independent endpoint monitoring
+
+Observe up to 32 configured web, proxy, load-balancer or CDN endpoints without
+issuing or deploying certificates. Specify the connection host and TLS name;
+trust and hostname validation are mandatory, with optional exact SHA-256 pins.
+Read fresh, failed or stale results through the API, CLI/TUI and metrics. These
+checks run from the CertLord host and do not prove global CDN propagation.
+
+[Independent TLS configuration](https://github.com/decryptus/certlord/blob/v{{version}}/docs/tls-endpoints.md)
+
 ## Deployment and verification
 
 Configure one legacy deployment job or up to 32 named destinations per certificate.

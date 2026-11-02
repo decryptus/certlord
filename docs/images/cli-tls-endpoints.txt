@@ -1,0 +1,8 @@
+$ certlord tls-endpoints
+TLS endpoints: partial (1/2 verified)
+web-a  verified  192.0.2.10:443
+  SNI: www.example.org
+  SHA-256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+proxy-b  stale  192.0.2.20:443
+  SNI: www.example.org
+  SHA-256: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa

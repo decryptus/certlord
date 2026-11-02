@@ -30,6 +30,8 @@ RECORDS[0].update(status='generated', deployment=json.loads((ROOT / 'scripts/des
 class DemoClient:
     def inventory(self):
         return RECORDS
+    def tls_endpoints(self):
+        return json.loads((ROOT / "scripts/tls-demo.json").read_text())
     def detail(self, identity):
         return next(record for record in RECORDS if record['certificate_id'] == identity)
 
@@ -43,6 +45,12 @@ async def capture(output, png=False):
         save(app, output, 'textual-inventory', artifacts, png)
         await pilot.press('enter'); await pilot.pause()
         save(app, output, 'textual-details', artifacts, png)
+
+    app = CertificateApp(DemoClient(), demo=True, endpoints=True)
+    async with app.run_test(size=(140, 38)) as pilot:
+        await pilot.pause()
+        await pilot.press('enter'); await pilot.pause()
+        save(app, output, 'textual-tls-endpoints', artifacts, png)
 
     sources = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest()
                for path in (ROOT / 'certlord').rglob('*.py')}

@@ -9,14 +9,16 @@
 
 TLS certificate lifecycle automation.
 
-Version: **1.1.0**. See the [release notes](docs/release-notes.md).
+Version: **1.2.0**. See the [release notes](docs/release-notes.md).
 
 CertLord automates TLS certificate issuance, renewal and deployment. It supports
 ACME through Certbot and importing existing PEM certificates, stores certificates
 in Vault and deploys them through Auton. Optional destination TLS verification checks
 the certificate actually served before acknowledgement. StatusCake/Updown adapters
 are optional; expiry observations are exposed for an external supervision system.
-It uses DWho, HTTPdis and Sonicprobe.
+Independent TLS checks also observe configured endpoints without issuing or
+deploying certificates. They expose the actual served fingerprint, failures and
+freshness through the API, CLI/TUI and metrics. It uses DWho, HTTPdis and Sonicprobe.
 
 Redis stores temporary ACME HTTP-01 challenge responses and tracks pending work,
 retries and deployment leases. Vault stores certificate material. Use the [Docker Compose installation](docs/docker-compose.md) to run the services
@@ -26,7 +28,7 @@ together, or provision them separately for the [Debian installation](docs/debian
 
 Use the [Compose guide](docs/docker-compose.md) for initialization, persistent
 Vault storage, API access and deployment configuration. The application image is
-`decryptus/certlord:1.1.0`.
+`decryptus/certlord:1.2.0`.
 
 ## Command line and terminal interface
 
@@ -62,6 +64,7 @@ See [MIGRATION.md](MIGRATION.md) before updating an existing installation.
 - [ACME HTTP Connector integration](docs/acme-connector.md)
 - [Debian 12 installation and isolated dependencies](docs/debian-installation.md)
 - [External certificate import and replacement](docs/certificate-import.md)
+- [Independent TLS endpoints: web, proxy, load balancer and CDN](docs/tls-endpoints.md)
 - [Operations and recovery](docs/operations.md)
 - [Operation correlation and optional Auton receipts](docs/operation-correlation.md)
 - [Coding conventions and contributions](CONTRIBUTING.md)

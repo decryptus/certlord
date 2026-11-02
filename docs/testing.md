@@ -39,7 +39,12 @@ and matching remote deployment receipts. All credentials and certificates used
 there are generated fixtures; never point these harnesses at production services.
 The lifecycle also exercises three named destinations with real Auton jobs and
 TLS listeners: one failed destination, persisted progress across restart, a
-targeted retry, and replacement invalidating every old fingerprint.
+targeted retry, and replacement invalidating every old fingerprint. The same
+installed harness then checks independent TLS endpoints, optional pins, trust/SNI
+failures, a requested cycle, unchanged Vault record/deployment counts, Redis
+ordering/TTL, stale evidence and reconfiguration across restart. No provider
+account or public certificate is required. Unit transport cases also reject an
+expired leaf with no pin configured.
 
 The Debian workflow builds a Debian 12 / amd64 package, checks a clean installed
 runtime, then uses disposable privileged containers with systemd as PID 1 to

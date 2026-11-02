@@ -1,4 +1,23 @@
-# CertLord 1.1.0
+# CertLord 1.2.0
+
+Independent TLS monitoring checks up to 32 configured web servers, reverse proxies,
+load balancers or CDN endpoints, without issuing or deploying a certificate.
+The connection address and TLS name are explicit. Trust, dates and hostname are
+always validated; an optional SHA-256 pin requires a specific leaf certificate.
+
+A bounded worker persists observations in Redis. Missing, failed and stale results
+remain distinct; only fresh successful checks count as verified. Read observations
+through the REST API, CLI, curses, Textual or Prometheus-format metrics. An explicit
+write-authorized request wakes the worker; read requests never launch probes.
+
+See [independent TLS monitoring](tls-endpoints.md) for configuration, API routes,
+upgrade steps, pin rotation and the limits of a single observation location.
+Existing CertLord service dependencies and the single active daemon requirement
+remain in place. The feature is disabled by default.
+
+Install `certlord==1.2.0` or `decryptus/certlord:1.2.0` once published.
+
+## CertLord 1.1.0
 
 Named deployment destinations add per-server Auton jobs, exact leaf TLS checks,
 persistent progress and partial-failure reporting. Successful destinations are

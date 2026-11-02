@@ -13,7 +13,7 @@ def probe(host, port, server_name, ca_file, expected, timeout):
         with socket.create_connection((host, port), timeout=timeout) as connection:
             with context.wrap_socket(connection, server_hostname=server_name) as secured:
                 actual = hashlib.sha256(secured.getpeercert(binary_form=True)).hexdigest()
-        if actual != expected:
+        if expected and actual != expected:
             return {'status': 'failed', 'error_code': 'fingerprint_mismatch',
                     'observed_fingerprint_sha256': actual}
         return {'status': 'verified', 'error_code': None,
