@@ -1,4 +1,4 @@
-# Evaluate CertLord 1.0.1
+# Evaluate CertLord 1.1.0
 
 Use a disposable environment and test domains/destinations under your control.
 The steps below evaluate your installation of the stable release. They are an
@@ -15,7 +15,7 @@ With Python 3.11 or 3.12 on POSIX:
 ```sh
 python -m venv .venv-certlord
 . .venv-certlord/bin/activate
-python -m pip install 'certlord==1.0.1'
+python -m pip install 'certlord==1.1.0'
 python -m pip check
 python -c 'from importlib.metadata import version; print(version("certlord"))'
 certlord list --help
@@ -30,8 +30,10 @@ and [ACME connector guide](acme-connector.md). Use one active lifecycle daemon.
 
 Set API authentication/permissions and HTTPS, independent Vault authentication
 and storage permissions, and an idempotent Auton deployment job. Keep optional
-monitoring disabled unless explicitly evaluated. Configure one
-[TLS verification destination](tls-verification.md) per certificate being tested.
+monitoring disabled unless explicitly evaluated. Configure legacy [TLS verification](tls-verification.md), or several
+[named destinations](multi-destination.md) with explicit Auton credentials.
+For the latter, test a partial failure, daemon restart and targeted retry before
+replacing the certificate and checking the new fingerprint at every target.
 The deployment job must validate server configuration before reload and protect
 private-key files. CertLord does not supply universal server rollback.
 

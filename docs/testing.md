@@ -12,8 +12,8 @@ python .github/scripts/check-test-collection.py --runner unittest .github/tests
 python -m unittest discover -s .github/tests -v
 ```
 
-The baseline contains 239 unit cases and 11 component-contract cases. The helper
-suite has eight cases, including one intentional skip for a pytest-only helper
+The baseline contains 268 unit cases and 11 component-contract cases. The helper
+suite has 19 cases, including one intentional skip for a pytest-only helper
 scenario. The project suites themselves use unittest. Empty, incomplete or duplicate
 collection must fail. Transport tests require permission to bind local sockets.
 
@@ -37,7 +37,9 @@ renewal, API authentication and HTTP errors, external certificate import and
 replacement, worker failure/restart recovery, served TLS checks, scheduler cycles
 and matching remote deployment receipts. All credentials and certificates used
 there are generated fixtures; never point these harnesses at production services.
-The baseline scenario contains 78 distinct stages.
+The lifecycle also exercises three named destinations with real Auton jobs and
+TLS listeners: one failed destination, persisted progress across restart, a
+targeted retry, and replacement invalidating every old fingerprint.
 
 The Debian workflow builds a Debian 12 / amd64 package, checks a clean installed
 runtime, then uses disposable privileged containers with systemd as PID 1 to

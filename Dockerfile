@@ -5,7 +5,7 @@ COPY . .
 RUN python -m pip wheel --wheel-dir /wheels '.[textual]' 'certbot==5.8.0' 'certbot-httpreq==0.0.24' 'acme-http-connector==0.2.1' 'auton==1.3.2' 'autond==1.3.2'
 
 FROM python:3.12-slim-bookworm
-ARG VERSION=1.0.1
+ARG VERSION=1.1.0
 LABEL org.opencontainers.image.title="CertLord" \
       org.opencontainers.image.description="TLS certificate lifecycle automation with ACME, Vault storage and Auton deployment." \
       org.opencontainers.image.source="https://github.com/decryptus/certlord" \

@@ -8,7 +8,8 @@ __version__ = '1.1.0'
 
 # Dispatch client commands before importing daemon modules or touching configuration.
 import sys
-if __name__ == '__main__' and len(sys.argv) > 1 and sys.argv[1] in ('list', 'show', 'create', 'remove', 'import', 'replace', 'tui'):
+from certlord.client import COMMANDS
+if __name__ == '__main__' and len(sys.argv) > 1 and sys.argv[1] in COMMANDS:
     from certlord.client.cli import main as client_main
     sys.exit(client_main(sys.argv[1:]))
 
@@ -54,7 +55,7 @@ def argv_parse_check():
     """
     Parse (and check a little) command line parameters
     """
-    parser        = argparse.ArgumentParser(epilog="HTTP client commands: certlord {list,show,create,remove,import,replace,tui} --help")
+    parser        = argparse.ArgumentParser(epilog="HTTP client commands: certlord {%s} --help" % ','.join(COMMANDS))
 
     parser.add_argument("-l",
                         dest      = 'loglevel',

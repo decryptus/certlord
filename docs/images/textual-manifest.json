@@ -12,7 +12,7 @@
     "forms.py": "03cde175be2774e837f3cb03677929d93f4acdb3f2194e90cd109c9d6db566b0",
     "dashboard.py": "b4f4a8db1143c7f48417d2f7d8c865108ce3f6c0ee124dcbc8c78f063a7cb794"
   },
-  "source_revision": "65b622f09aa7edcef54d3a7af42e3c1e01ad5068",
+  "source_revision": "61db5be666015e6e2d1440a111d9e959e783bb6d",
   "dirty": true,
   "source_sha256": {
     "certlord/composition.py": "1505f89deee5d78d564bc93149bccacafc5782f6532e2f065d94abd72bcf8b3c",
@@ -42,12 +42,12 @@
     "certlord/adapters/processes.py": "abb0206a6cde3ffc63eb8df9b95d33fa51e206d4a904216a081fff4883d55fc4",
     "certlord/ports/certificates.py": "afbc7f46196c57c16f1b12a696b7cc3670e384587908df78374f04d5f4e027df",
     "certlord/ports/__init__.py": "0a9b3944dbcf08db8489ea35cda928791046a285a435e45226301931b114dcb6",
-    "certlord/client/cli.py": "3a5da250298d79b68aa9477d8093a86ddb4f3ba3d308755b84184d762f95ab1f",
+    "certlord/client/cli.py": "85876216663b19af48017faa97c3be318035a55fa8bd25c0277a7200526a25f4",
     "certlord/client/api.py": "0f2f5229890d9427ac5eb64fa8065e53ea5709ba5a2327407c9e96348032c1ea",
     "certlord/client/textual_tui.py": "16ad5ed7844ab76077f469b5fe1fb7642faecfc6d843f0218c11e008c5e325b9",
     "certlord/client/tui.py": "88c483cc8add8c34d92688fd5c16de9a38856e8b5d441543579851eb75acb2fd",
     "certlord/client/presentation.py": "cf1acd922f3bf3255743d69865948f5e062c7ef6d45b6dcf0aba575ba1bb8f94",
-    "certlord/client/__init__.py": "e58dddb5ee93d898ef2d8c7078cb48dbbc25fc4bc72455cf4e549d637524e244",
+    "certlord/client/__init__.py": "2cfa4e228ce39fdc93b7d98e833f2f241b3dda24de60b3adfa090d660e98770d",
     "certlord/services/identity_definition.py": "abd61724371759079284e155cecd45f3c5f367c780af5e6a4715ffef20f780e6",
     "certlord/services/monitoring.py": "f3503fec792ebfbf8fbda1e450bf9f006382ed461c35119131f8cf4e4f650448",
     "certlord/services/deployment.py": "09d8d978a4db12591864ba065d884dd524fe491436ff4032a2448c5b4e8dfe2f",

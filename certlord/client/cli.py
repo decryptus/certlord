@@ -6,8 +6,7 @@ from dwho.cli import require_terminal, write_json
 from certlord.client.api import CertificateClient, ClientError
 from certlord.services.certificate_ids import resolve_certificate, short_ids
 from certlord.client.presentation import destination_lines
-
-COMMANDS = ('list', 'show', 'create', 'remove', 'import', 'replace', 'retry-destination', 'tui')
+from certlord.client import COMMANDS
 
 
 def parser():

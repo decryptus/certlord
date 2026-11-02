@@ -80,3 +80,29 @@ jobs:
           tags: |
             decryptus/certlord:${{ steps.version.outputs.version }}
             decryptus/certlord:latest
+      - name: Render registry documentation
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          text = Path('DOCKERHUB.md').read_text().replace('{{version}}', Path('VERSION').read_text().strip())
+          assert '{{' not in text and len(text.encode()) <= 25000
+          Path('/tmp/certlord-dockerhub.md').write_text(text)
+          PY
+      - name: Synchronize Docker Hub description
+        uses: peter-evans/dockerhub-description@432a30c9e07499fd01da9f8a49f0faf9e0ca5b77 # v4
+        with:
+          username: decryptus
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          repository: decryptus/certlord
+          short-description: 'TLS certificates: ACME, PEM import, Vault storage and verified deployment to multiple destinations.'
+          readme-filepath: /tmp/certlord-dockerhub.md
+      - name: Verify registry documentation
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import json, urllib.request
+          with urllib.request.urlopen('https://hub.docker.com/v2/repositories/decryptus/certlord/', timeout=20) as response:
+              metadata = json.loads(response.read(1048576))
+          assert metadata['full_description'] == Path('/tmp/certlord-dockerhub.md').read_text()
+          print('Docker Hub documentation matches the released source.')
+          PY
