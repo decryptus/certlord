@@ -29,7 +29,13 @@ def collect(directory):
     logs += sorted((directory / 'certbot/logs').glob('letsencrypt.log*'))
     for log in logs:
         locations = []
-        log_text = log.read_text(errors='replace')
+        try:
+            log_text = log.read_text(errors='replace')
+        except OSError:
+            # Daemons are still alive here: rotation must not mask the test error.
+            result[str(log.relative_to(directory))] = {
+                'locations': [], 'categories': ['Log unavailable']}
+            continue
         for line in log_text.splitlines():
             match = re.match(r'\s*File "([^"]+)", line ([0-9]+), in ([a-zA-Z_][a-zA-Z_0-9]*)', line)
             if match:

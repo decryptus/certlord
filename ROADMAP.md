@@ -13,8 +13,9 @@ Updated: 2026-11-03. Published stable release: 1.2.0.
   deactivation in the disposable fixture. Actual rejected/in-flight HTTP-01,
   interrupted pending work and recovery assertions remain enforced in both
   ordinary and systemd lifecycle runs.
-- Added sanitized nested/rotated Certbot diagnostics and three regression cases
-  covering inclusion, credential exclusion and bounded traceback locations.
+- Added sanitized nested/rotated Certbot diagnostics and four regression cases
+  covering inclusion, credential exclusion, bounded traceback locations and
+  unavailable logs that must not mask the original test failure.
 - Validation and merge status are tracked in the maintenance pull request.
 - Delivery scope: test harness and contributor documentation only. Published
   PyPI/Docker Hub 1.2.0 artifacts, registry descriptions, user guides, Compose

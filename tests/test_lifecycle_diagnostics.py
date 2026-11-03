@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 import tempfile
 import unittest
+from unittest.mock import patch
 
 
 spec = importlib.util.spec_from_file_location(
@@ -51,3 +52,13 @@ class LifecycleDiagnosticsTests(unittest.TestCase):
                 '  File "/tmp/client.py", line %d, in poll\n' % n for n in range(30)))
             locations = diagnostics.collect(root)['worker.log']['locations']
             self.assertEqual([item['line'] for item in locations], list(range(15, 30)))
+
+    def test_unreadable_or_rotated_log_does_not_mask_the_test_failure(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / 'worker.log').touch()
+            for error in (FileNotFoundError('secret-path'), PermissionError('secret-path')):
+                with self.subTest(error=type(error).__name__), \
+                        patch.object(Path, 'read_text', side_effect=error):
+                    self.assertEqual(diagnostics.collect(root), {
+                        'worker.log': {'locations': [], 'categories': ['Log unavailable']}})

@@ -12,7 +12,7 @@ python .github/scripts/check-test-collection.py --runner unittest .github/tests
 python -m unittest discover -s .github/tests -v
 ```
 
-The baseline contains 282 unit cases and 11 component-contract cases. The helper
+The baseline contains 283 unit cases and 11 component-contract cases. The helper
 suite has 19 cases, including one intentional skip for a pytest-only helper
 scenario. The project suites themselves use unittest. Empty, incomplete or duplicate
 collection must fail. Transport tests require permission to bind local sockets.
@@ -67,6 +67,8 @@ recovery assertions remain mandatory. Do not replace them with retries or sleeps
 Failure reports include the worker logs and Certbot's nested/rotated logs, reduced
 to traceback locations and fixed diagnostic categories. Raw log lines, exception
 messages, account keys, credentials and certificate material are not retained.
+Logs that disappear during rotation are reported as unavailable without masking
+the original test failure.
 
 The Debian workflow builds a Debian 12 / amd64 package, checks a clean installed
 runtime, then uses disposable privileged containers with systemd as PID 1 to
