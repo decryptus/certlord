@@ -12,6 +12,6 @@ CMD ["/sbin/init"]
 FROM service AS lifecycle
 RUN /opt/venvs/certlord/bin/python -m pip install autond==1.2.1
 COPY tools/ /fixture/tools/
-COPY lifecycle.py network_faults.py systemd_process.py auton-routes.yml /fixture/
+COPY lifecycle.py diagnostics.py network_faults.py systemd_process.py auton-routes.yml /fixture/
 COPY source/etc/ /fixture/source/etc/
 COPY auton-routes.yml /fixture/source/tests/integration/auton-routes.yml

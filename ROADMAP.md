@@ -1,6 +1,25 @@
 # CertLord roadmap
 
-Updated: 2026-11-02. Published stable release: 1.2.0.
+Updated: 2026-11-03. Published stable release: 1.2.0.
+
+## Post-1.2.0 — ACME acceptance reliability
+
+- Reproduced the HTTP-01 negative-case failure by forcing valid authorization
+  reuse. Pebble 2.10.1's zero-percent setting still permits 1% reuse; a reused
+  authorization bypasses the challenge expected by both fault scenarios.
+  The old failure reports lack sufficient Certbot diagnostics to attribute every
+  historical failure conclusively.
+- Implemented deterministic reuse followed by explicit ACME authorization
+  deactivation in the disposable fixture. Actual rejected/in-flight HTTP-01,
+  interrupted pending work and recovery assertions remain enforced in both
+  ordinary and systemd lifecycle runs.
+- Added sanitized nested/rotated Certbot diagnostics and three regression cases
+  covering inclusion, credential exclusion and bounded traceback locations.
+- Validation and merge status are tracked in the maintenance pull request.
+- Delivery scope: test harness and contributor documentation only. Published
+  PyPI/Docker Hub 1.2.0 artifacts, registry descriptions, user guides, Compose
+  pins, UI captures, demos and bilingual product websites remain applicable and
+  unchanged; no runtime release or service deployment is needed.
 
 ## Delivered — 1.2.0
 
@@ -73,9 +92,6 @@ and does not configure or upgrade an existing production daemon.
 No public or production certificates are required for these synthetic tests.
 
 ## Later work
-
-- Investigate intermittent failures in the existing ACME integration fixtures
-  (HTTP-01 negative case and waiting for an in-flight scheduler challenge).
 
 - Provider-specific deployment connectors, starting with AWS/CloudFront after
   permissions, region and propagation requirements are qualified.

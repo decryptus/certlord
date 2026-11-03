@@ -20,7 +20,6 @@ from importlib.metadata import version
 import ipaddress
 import json
 import os
-import re
 from pathlib import Path
 import shutil
 import signal
@@ -689,7 +688,9 @@ def exercise(args, directory, stack, report):
     front_server = ThreadingHTTPServer(('127.0.0.1', 0), frontend.handler())
     http_thread(stack, front_server)
     tls_cert, tls_key = tls_fixture(directory)
-    env.update(PEBBLE_VA_NOSLEEP='1', PEBBLE_AUTHZREUSE='0', PEBBLE_WFE_NONCEREJECT='0',
+    # Pebble 2.10.1 uses rand.Intn(100) > reusePercent: 0 still reuses 1%.
+    # Force reuse and explicitly deactivate the authorization before fault tests.
+    env.update(PEBBLE_VA_NOSLEEP='1', PEBBLE_AUTHZREUSE='100', PEBBLE_WFE_NONCEREJECT='0',
                REQUESTS_CA_BUNDLE=str(tls_cert))
     acme_port, management_port, dns_port, dns_management = [free_port() for _ in range(4)]
     pebble_config = directory / 'pebble.json'
@@ -1128,9 +1129,12 @@ path "secret/metadata/cas-fixture/*" { capabilities = ["read", "list"] }
             'Served certificate differs from stored issuance')
     phase('auton-deployed-certificate-served-with-trusted-tls')
     cycle('crawl', 'schedule-renewal')
+    renewal_reads = frontend.reads
     cycle('issue', 'renewal')
     renewed = certificate_checks(stored())
     require(renewed.serial_number != first.serial_number, 'Renewal reused the certificate')
+    require(frontend.reads == renewal_reads, 'Forced authorization reuse still challenged HTTP-01')
+    phase('renewal-reuses-valid-authorization-without-http01')
     require(challenges.dbsize() == 0, 'Renewal left challenge keys')
     cycle('crawl', 'queue-renewal')
     renewal_queue = pending.smembers(SERVER_ID)
@@ -1163,6 +1167,38 @@ path "secret/metadata/cas-fixture/*" { capabilities = ["read", "list"] }
     require(served_fingerprint(listener.server_port, trust) == renewed.fingerprint(hashes.SHA256()).hex(),
             'Renewed certificate was not actually served')
     phase('renewed-distinct-certificate-served')
+
+    # Use only this invocation's disposable account and loopback CA. An unfinalized
+    # order exposes its reused authorization through the normal ACME protocol.
+    # Deactivation preserves the account/lineage and issued leaf, while requiring
+    # a fresh challenge for both the rejection and subsequent interruption tests.
+    from acme import client as acme_client, messages as acme_messages
+    import josepy
+    accounts = list((directory / 'certbot/config/accounts').glob('**/regr.json'))
+    require(len(accounts) == 1, 'Expected exactly one disposable Certbot account')
+    registration = acme_messages.RegistrationResource.json_loads(accounts[0].read_text())
+    key = josepy.JWK.from_json(json.loads((accounts[0].parent / 'private_key.json').read_text()))
+    # ClientNetwork forwards verify_ssl to requests, which accepts a CA bundle path.
+    network = acme_client.ClientNetwork(key, account=registration,
+                                       verify_ssl=str(tls_cert), timeout=5)
+    try:
+        client = acme_client.ClientV2(acme_client.ClientV2.get_directory(acme_url, network), network)
+        csr = (x509.CertificateSigningRequestBuilder()
+               .subject_name(x509.Name([]))
+               .add_extension(x509.SubjectAlternativeName([x509.DNSName(DOMAIN)]), critical=False)
+               .sign(ec.generate_private_key(ec.SECP256R1()), hashes.SHA256()))
+        order = client.new_order(csr.public_bytes(serialization.Encoding.PEM))
+        require(len(order.authorizations) == 1, 'Expected one reused fixture authorization')
+        authorization = order.authorizations[0]
+        require(authorization.body.status == acme_messages.STATUS_VALID
+                and authorization.body.identifier.value == DOMAIN,
+                'Fault-test setup did not reproduce valid authorization reuse')
+        deactivated = client.deactivate_authorization(authorization)
+        require(deactivated.body.status == acme_messages.STATUS_DEACTIVATED,
+                'Fixture authorization was not deactivated')
+    finally:
+        network.session.close()
+    phase('reused-acme-authorization-deactivated-before-http01-faults')
     frontend.reject = True
     before_reads = frontend.reads
     cycle('crawl', 'schedule-invalid-renewal')
@@ -2096,28 +2132,8 @@ def main():
             try:
                 exercise(args, Path(temporary), stack, report)
             except Exception:
-                diagnostics = {}
-                for log in Path(temporary).glob('*.log'):
-                    locations = []
-                    for line in log.read_text(errors='replace').splitlines():
-                        match = re.match(r'\s*File "([^"]+)", line ([0-9]+), in ([a-zA-Z_][a-zA-Z_0-9]*)', line)
-                        if match:
-                            locations.append({'file': Path(match[1]).name,
-                                              'line': int(match[2]), 'function': match[3]})
-                        elif re.match(r'^[A-Za-z_][A-Za-z_0-9.]*(Error|Exception):', line):
-                            locations.append({'exception': line.split(':', 1)[0]})
-                    categories = ('Another instance of Certbot is already running',
-                                  'Connection refused', 'Max retries exceeded', 'Read timed out',
-                                  'Certbot failed to authenticate', 'Some challenges have failed',
-                                  'challenge is invalid', 'Error determining zone',
-                                  'HTTPError', 'HTTP 503', 'HTTP 401', 'HTTP 403',
-                                  'Failed to establish a new connection', 'max retries exceeded',
-                                  'Failed to renew', 'Failed to parse', 'does not appear to be running')
-                    log_text = log.read_text(errors='replace')
-                    matched = [category for category in categories if category in log_text]
-                    if locations or matched:
-                        diagnostics[log.name] = {'locations': locations[-15:], 'categories': matched}
-                report['diagnostics'] = diagnostics
+                from diagnostics import collect
+                report['diagnostics'] = collect(Path(temporary))
                 raise
     except Exception as error:
         report['error'] = str(error)
