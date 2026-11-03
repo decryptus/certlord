@@ -1,10 +1,9 @@
 # AWS / CloudFront connector qualification
 
-**Contributor work, not a released deployment connector.** The repository contains
-a read-only preflight tool and offline regression/SDK contracts. It does not import
-certificates, change distributions, fetch private keys from Vault, or qualify real
-AWS propagation. CertLord 1.2.0 and its existing deployment configuration are unchanged.
-The implementation and live acceptance of an AWS writer remain pending.
+The read-only preflight and an [experimental renewal job](cloudfront-renewal-job.md)
+are implemented in this candidate branch, with offline and local acceptance.
+Actual AWS account, IAM and CloudFront propagation acceptance remains pending.
+Published CertLord 1.2.0 does not include this writer.
 
 ## First connector scope
 
@@ -104,9 +103,9 @@ Errors expose fixed codes, never raw provider messages or credentials; the proce
 returns a nonzero exit code. `check-config` success means syntax only, with
 `aws_contacted: false`.
 
-## Writer contract still to implement
+## Writer contract and remaining live gates
 
-The future provider job will use the existing
+The candidate provider job uses the existing
 [named destination Auton contract](multi-destination.md#auton-job-contract): UUID,
 domain, exact certificate generation and destination. Its own scoped storage
 credentials must retrieve current material; keys must never be command arguments.
@@ -134,7 +133,7 @@ are being advertised as available in 1.2.0.
 | Offline preflight regressions | Wrong account/region/resource, shared ARN, aliases, managed certificate, malformed leaf, key mismatch, expiry, redaction and exact read policy | Implemented in `tests/test_cloudfront_preflight.py`; discovered by normal unittest CI |
 | SDK contract | Actual pinned Boto3/Botocore models, stubbed success and AccessDenied, exact request parameters, verified AWS endpoints despite override, no pending responses | Implemented in `tests/integration/cloudfront_sdk_contract.py`; explicit offline Python 3.12 CI job |
 | Read-only AWS snapshot | Execute with scoped test identity and existing owned resources | Not run; account/profile and target identifiers are not available |
-| Writer and local recovery | Real Auton/Vault/Redis lifecycle plus controlled provider failure responses; stale generation, restart, lost response and ARN quarantine | Not implemented |
+| Writer and local recovery | Real Auton/Vault/Redis lifecycle plus controlled provider responses; generation, SIGKILL, restart, lost response and ARN quarantine | Implemented candidate; normal unit and installed lifecycle CI |
 | Live AWS renewal | Owned test domain with public trusted leaf, existing ACM ARN/distribution, approved writer role; import/read-back, observed TLS change and wrong-resource denial | Not run; requires a separate test environment |
 | Supported release | Runtime/docs/configuration/UI changes, immutable PyPI/Docker artifacts, examples, bilingual websites and applicable demos after acceptance | Deferred until writer and live gates pass |
 
@@ -145,7 +144,7 @@ uses synthetic credentials and certificates, so this is never AWS acceptance:
 python tests/integration/cloudfront_sdk_contract.py
 ```
 
-The current delivery contains contributor tooling, tests and documentation only.
-The source archive includes the tools; the runtime wheel does not gain an AWS SDK
-dependency or provider adapter. Registry versions/descriptions, user guides, Compose,
-UI captures, demos and product websites remain valid for 1.2.0 and are unchanged.
+The candidate wheel includes the optional `certlord.cloudfront` job and `cloudfront`
+SDK extra; default daemon dependencies and configuration are unchanged. This is
+not a published release. Registry versions/descriptions, user guides, Compose, UI
+captures, demos and product websites remain on stable 1.2.0 pending live acceptance.

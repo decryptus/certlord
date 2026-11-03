@@ -8,14 +8,19 @@ Updated: 2026-11-03. Published stable release: 1.2.0.
   for renewal of one existing imported ACM viewer certificate on one distribution.
   The tool checks explicit account/region/resource binding, domain, fingerprint,
   validity and unshared ownership; it can generate an exact-resource read policy.
-- Offline coverage includes 13 unittest cases and two pinned-SDK scenarios using
-  synthetic credentials and stubbed service calls. No real AWS account, import,
-  propagation or write permissions have been validated by this work.
-- Writer implementation remains pending: generation/profile binding, per-ARN
-  serialization, uncertain-request quarantine and asynchronous TLS verification
-  are explicit acceptance gates. A local fixture cannot certify AWS edge behavior.
-- Delivery scope is contributor tooling/tests/docs; the 1.2.0 runtime, registries,
-  user documentation, Compose, captures, demos and bilingual websites are unchanged.
+- Implemented the [experimental renewal job](docs/cloudfront-renewal-job.md):
+  immutable profile/selector binding, read-only Vault AppRole, existing-ARN ACM
+  reimport, durable intent and process lock, uncertain-request quarantine,
+  read-back and exact trusted TLS verification. It is an unreleased candidate.
+- Offline coverage: 13 preflight + 18 writer unit cases and five pinned-SDK
+  scenarios. Installed local acceptance adds real Vault HTTPS/AppRole, Auton,
+  Redis and TLS with a controlled HTTP provider. Local tests cannot certify AWS.
+- Remaining gates: real scoped test-account preflight, reimport and observed TLS,
+  wrong-resource IAM denial, then supported release and delivery synchronization.
+  No real AWS account, write permission or edge propagation is validated here.
+- Candidate package gains an optional module/SDK extra. Stable 1.2.0 PyPI/Docker,
+  user guides, Compose, captures, demos and FR/EN websites remain unchanged until
+  the candidate passes live acceptance; no immutable release is overwritten.
 
 ## Delivered — ACME acceptance reliability (post-1.2.0)
 
