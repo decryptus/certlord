@@ -2,6 +2,21 @@
 
 Updated: 2026-11-03. Published stable release: 1.2.0.
 
+## In progress — AWS / CloudFront qualification
+
+- Prepared a [contributor contract and read-only preflight](docs/cloudfront-qualification.md)
+  for renewal of one existing imported ACM viewer certificate on one distribution.
+  The tool checks explicit account/region/resource binding, domain, fingerprint,
+  validity and unshared ownership; it can generate an exact-resource read policy.
+- Offline coverage includes 13 unittest cases and two pinned-SDK scenarios using
+  synthetic credentials and stubbed service calls. No real AWS account, import,
+  propagation or write permissions have been validated by this work.
+- Writer implementation remains pending: generation/profile binding, per-ARN
+  serialization, uncertain-request quarantine and asynchronous TLS verification
+  are explicit acceptance gates. A local fixture cannot certify AWS edge behavior.
+- Delivery scope is contributor tooling/tests/docs; the 1.2.0 runtime, registries,
+  user documentation, Compose, captures, demos and bilingual websites are unchanged.
+
 ## Delivered — ACME acceptance reliability (post-1.2.0)
 
 - Reproduced the HTTP-01 negative-case failure by forcing valid authorization
@@ -102,7 +117,8 @@ No public or production certificates are required for these synthetic tests.
 ## Later work
 
 - Provider-specific deployment connectors, starting with AWS/CloudFront after
-  permissions, region and propagation requirements are qualified.
+  permissions, region and propagation requirements are qualified. The read-only
+  preparation above is available separately; the writer is not implemented.
 - External geographic monitoring where provider capabilities permit it; local
   checks do not establish that every CDN point of presence serves the same leaf.
 

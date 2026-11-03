@@ -12,7 +12,7 @@ python .github/scripts/check-test-collection.py --runner unittest .github/tests
 python -m unittest discover -s .github/tests -v
 ```
 
-The baseline contains 283 unit cases and 11 component-contract cases. The helper
+The baseline contains 296 unit cases and 11 component-contract cases. The helper
 suite has 19 cases, including one intentional skip for a pytest-only helper
 scenario. The project suites themselves use unittest. Empty, incomplete or duplicate
 collection must fail. Transport tests require permission to bind local sockets.
@@ -30,6 +30,10 @@ python -m unittest discover -s textual_tests -v
 ```
 
 ## Disposable integration environments
+
+The separate offline CloudFront SDK job qualifies a read-only contributor tool,
+using synthetic credentials and Botocore Stubber. It does not call AWS or qualify
+a deployment connector. See [scope, commands and remaining gates](cloudfront-qualification.md).
 
 The lifecycle workflow runs `tests/integration/lifecycle.py` with real disposable
 Vault, Redis, Pebble, Certbot and Auton services. It exercises HTTP-01 issuance and
