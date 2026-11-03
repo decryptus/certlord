@@ -11,6 +11,12 @@ TLS certificate lifecycle automation.
 
 Version: **1.2.0**. See the [release notes](docs/release-notes.md).
 
+**Development status:** the source tree also contains an experimental AWS/CloudFront
+renewal job, not included in published 1.2.0. It is inactive by default and requires
+an optional SDK plus an explicitly configured job. Local tests pass; real AWS/IAM
+and CloudFront propagation are not yet qualified. See the
+[contributor qualification guide](docs/cloudfront-qualification.md).
+
 CertLord automates TLS certificate issuance, renewal and deployment. It supports
 ACME through Certbot and importing existing PEM certificates, stores certificates
 in Vault and deploys them through Auton. Optional destination TLS verification checks

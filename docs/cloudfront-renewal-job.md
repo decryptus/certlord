@@ -1,9 +1,18 @@
 # Experimental CloudFront renewal job
 
-This is an **unreleased candidate for contributor acceptance**, not a supported
-feature of published CertLord 1.2.0. The writer is implemented; actual AWS/IAM and
-CloudFront edge propagation have not been qualified. Use a dedicated test
-account/domain before considering release. See [qualification gates](cloudfront-qualification.md).
+This is an **experimental, opt-in connector in the development source tree**,
+not a supported feature of published CertLord 1.2.0. Offline and local integration
+checks pass; actual AWS/IAM and CloudFront edge propagation remain unqualified.
+Live qualification is required before promoting this connector as production
+supported. It does not block merging the experimental implementation or releasing
+other CertLord work. See [qualification gates](cloudfront-qualification.md).
+
+**Inactive by default:** the daemon does not load or schedule this module. The
+normal installation does not install Boto3; installing the optional `cloudfront`
+extra alone does not activate anything. Execution requires an explicit `run`
+command, immutable job profile and selectors, or an explicitly configured Auton
+endpoint and CertLord destination. Default service and Compose configurations do
+not create a writer. No AWS account is needed to develop or run the local tests.
 
 The job consumes the existing named-destination contract: certificate UUID,
 exact domain, generation digest and destination name. It reads that exact Vault
@@ -44,7 +53,7 @@ new generation, and uncertainty blocks newer writes. External AWS association
 changes are likewise not made atomic by preflight checks. One TLS observation
 does not certify all global edge locations.
 
-## Prepare an immutable test profile
+## Explicitly configure an experimental job
 
 Install the **candidate checkout** in an isolated environment (published 1.2.0
 does not contain this module):
@@ -187,8 +196,15 @@ and simulates a lost receipt followed by quarantine and explicit reconciliation.
 The simulator's completion is known locally; that property cannot be assumed for
 AWS. No live AWS account, IAM permission or global propagation result is claimed.
 
-The wheel now includes an optional candidate module/SDK extra. No new stable tag,
-PyPI or Docker artifact is published. Existing user guides, registry descriptions,
-Compose pins, CLI/UI captures, demos and FR/EN websites continue to describe
-stable 1.2.0. Update those surfaces with the supported release after live acceptance;
-do not advertise this draft as a delivered provider connector.
+The development wheel includes an optional experimental module/SDK extra. This
+integration does not publish a tag, PyPI package or Docker image and does not
+activate the connector in a deployment. Registry descriptions, Compose pins,
+CLI/UI captures, demos and FR/EN websites continue to describe published 1.2.0.
+
+A subsequent CertLord release can include the opt-in experiment alongside other
+changes, provided release notes and affected user-facing surfaces retain the
+experimental status and lack of live qualification. Normal artifact, documentation
+and deployment checks still apply. Only promotion of the AWS connector to
+production-supported status depends on the separate live acceptance record.
+Never overwrite the immutable 1.2.0 artifacts or label local simulation as AWS
+acceptance.

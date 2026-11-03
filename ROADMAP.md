@@ -2,7 +2,7 @@
 
 Updated: 2026-11-03. Published stable release: 1.2.0.
 
-## In progress — AWS / CloudFront qualification
+## Implemented — experimental AWS / CloudFront connector
 
 - Prepared a [contributor contract and read-only preflight](docs/cloudfront-qualification.md)
   for renewal of one existing imported ACM viewer certificate on one distribution.
@@ -11,16 +11,25 @@ Updated: 2026-11-03. Published stable release: 1.2.0.
 - Implemented the [experimental renewal job](docs/cloudfront-renewal-job.md):
   immutable profile/selector binding, read-only Vault AppRole, existing-ARN ACM
   reimport, durable intent and process lock, uncertain-request quarantine,
-  read-back and exact trusted TLS verification. It is an unreleased candidate.
+  read-back and exact trusted TLS verification. Implementation is tracked in
+  [PR #16](https://github.com/decryptus/certlord/pull/16); it is experimental and
+  inactive by default, with no automatic daemon or Compose activation.
 - Offline coverage: 13 preflight + 18 writer unit cases and five pinned-SDK
   scenarios. Installed local acceptance adds real Vault HTTPS/AppRole, Auton,
   Redis and TLS with a controlled HTTP provider. Local tests cannot certify AWS.
-- Remaining gates: real scoped test-account preflight, reimport and observed TLS,
-  wrong-resource IAM denial, then supported release and delivery synchronization.
-  No real AWS account, write permission or edge propagation is validated here.
-- Candidate package gains an optional module/SDK extra. Stable 1.2.0 PyPI/Docker,
-  user guides, Compose, captures, demos and FR/EN websites remain unchanged until
-  the candidate passes live acceptance; no immutable release is overwritten.
+- Validated locally and in CI: 314 unit cases, 11 contracts, five SDK cases,
+  86 installed lifecycle stages and 47 systemd stages; Python/dependency matrices,
+  installed packages, Debian, amd64/arm64 Compose, Textual and captures pass.
+- Integration and production qualification are separate: merging this opt-in
+  experiment and releasing other CertLord work do not require an AWS account.
+  Production-qualified status still requires real scoped preflight, reimport,
+  observed TLS change and wrong-resource IAM denial. That evidence is pending;
+  local tests do not establish AWS behavior or global propagation.
+- No release or deployment is performed by this integration. Stable 1.2.0
+  PyPI/Docker artifacts, Compose pins, registry descriptions, captures, demos and
+  FR/EN websites remain unchanged. A later version may include the experiment
+  with explicit labeling and normal delivery checks; AWS qualification does not
+  freeze those releases. No immutable release is overwritten.
 
 ## Delivered — ACME acceptance reliability (post-1.2.0)
 
@@ -121,9 +130,11 @@ No public or production certificates are required for these synthetic tests.
 
 ## Later work
 
-- Provider-specific deployment connectors, starting with AWS/CloudFront after
-  permissions, region and propagation requirements are qualified. The read-only
-  preparation above is available separately; the writer is not implemented.
+- Production qualification of the implemented experimental AWS/CloudFront
+  connector: real permissions, resource/region binding and observed propagation.
+  This is a separate milestone, not a blocker for other CertLord development.
+- Additional provider-specific deployment connectors, each with its own scope
+  and acceptance evidence.
 - External geographic monitoring where provider capabilities permit it; local
   checks do not establish that every CDN point of presence serves the same leaf.
 
