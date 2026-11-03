@@ -2,7 +2,7 @@
 
 Updated: 2026-11-03. Published stable release: 1.2.0.
 
-## Post-1.2.0 — ACME acceptance reliability
+## Delivered — ACME acceptance reliability (post-1.2.0)
 
 - Reproduced the HTTP-01 negative-case failure by forcing valid authorization
   reuse. Pebble 2.10.1's zero-percent setting still permits 1% reuse; a reused
@@ -16,7 +16,14 @@ Updated: 2026-11-03. Published stable release: 1.2.0.
 - Added sanitized nested/rotated Certbot diagnostics and four regression cases
   covering inclusion, credential exclusion, bounded traceback locations and
   unavailable logs that must not mask the original test failure.
-- Validation and merge status are tracked in the maintenance pull request.
+- Merged in [PR #14](https://github.com/decryptus/certlord/pull/14). All checks
+  pass on its final revision: 283 unit cases, 11 contracts, 2 Textual cases,
+  84 installed lifecycle stages and 47 installed-systemd lifecycle stages.
+  Python 3.11/3.12 minimum/latest and installed-package matrices, Debian service
+  acceptance, amd64/arm64 Compose, documentation captures and distribution
+  inventory pass. The 19 CI-helper cases include one intentional pytest-only
+  skip; the strict Sphinx build also passes locally. The final CI runs required
+  no retries or disabled assertions.
 - Delivery scope: test harness and contributor documentation only. Published
   PyPI/Docker Hub 1.2.0 artifacts, registry descriptions, user guides, Compose
   pins, UI captures, demos and bilingual product websites remain applicable and
