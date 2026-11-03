@@ -12,3 +12,4 @@ For installation and operation, return to :doc:`/index`.
    /docs/architecture
    /docs/components
    /docs/testing
+   /docs/cloudfront-qualification
