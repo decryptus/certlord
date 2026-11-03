@@ -18,5 +18,5 @@ myst_fence_as_directive = ["mermaid"]
 
 # Keep both documentation audiences explicit on every generated page.
 templates_path = ['_templates']
-html_context = {'contributor_index': 'docs/contributors', 'contributor_pages': ['docs/contributors', 'docs/contributing', 'docs/architecture', 'docs/components', 'docs/testing']}
+html_context = {'contributor_index': 'docs/contributors', 'contributor_pages': ['docs/contributors', 'docs/contributing', 'docs/architecture', 'docs/components', 'docs/testing', 'docs/cloudfront-qualification', 'docs/cloudfront-renewal-job']}
 html_sidebars = {'**': ['about.html', 'documentation-tracks.html', 'localtoc.html', 'searchbox.html']}

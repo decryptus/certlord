@@ -23,7 +23,7 @@ jobs:
           python -m pip install . 'certbot-httpreq==0.0.24' 'acme-http-connector==0.2.1' 'certbot==5.8.0' 'auton==1.2.1' 'autond==1.2.1'
       - name: Install checksum-verified disposable CA and Vault
         run: bash .github/scripts/install-lifecycle-tools.sh "$RUNNER_TEMP/certlord-tools"
-      - name: Installed lifecycle, actual served TLS and failure recovery
+      - name: Installed lifecycle, CloudFront controlled writer, actual TLS and recovery
         working-directory: ${{ runner.temp }}
         run: >-
           python "$GITHUB_WORKSPACE/tests/integration/lifecycle.py" run

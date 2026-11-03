@@ -2051,6 +2051,9 @@ path "secret/metadata/certlord-fixture/*" { capabilities = ["list"] }
     from destinations import exercise as destination_acceptance
     certlord = destination_acceptance(args.source, directory, stack, env, config, config_path,
         certlord, vault, api, imported_id, external_domain, replacement_material(40), tls_cert, phase)
+    from cloudfront_lifecycle import exercise as cloudfront_acceptance
+    certlord = cloudfront_acceptance(args.source, directory, stack, env, config, config_path,
+        certlord, vault, api, imported_id, external_domain, replacement_material, tls_cert, phase)
     current_meta = requests.get(api + '/api/certificates/' + imported_id, timeout=5).json()
     require(requests.delete(api + '/api/certificates/' + imported_id, timeout=10).ok, 'Removal before replacement failed')
     require(requests.put(replacement_url, json=dict(cli_material, expected_version=current_meta['version']), timeout=10).status_code == 409,

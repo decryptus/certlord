@@ -13,3 +13,4 @@ For installation and operation, return to :doc:`/index`.
    /docs/components
    /docs/testing
    /docs/cloudfront-qualification
+   /docs/cloudfront-renewal-job

@@ -15,7 +15,7 @@ from unittest.mock import patch
 import boto3
 from botocore.stub import Stubber
 
-import cloudfront_preflight as preflight
+from certlord.cloudfront import preflight
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from import_fixture import material
@@ -98,6 +98,63 @@ def exercise(denied=False):
     print('PASS: offline-sdk-' + ('denied-and-redacted' if denied else 'scoped-read-snapshot'))
 
 
+def exercise_import(outcome):
+    from certlord.cloudfront.aws import AwsProvider
+    from certlord.cloudfront.config import JobError
+    from certlord.cloudfront.ledger import Ledger
+    from certlord.cloudfront.material import current_material, material_digest
+    from certlord.cloudfront.writer import Renewal
+    from certlord.services.deployment import certificate_generation
+    from cryptography import x509
+    from cryptography.hazmat.primitives import hashes
+    import threading
+    record = dict(material(offset=1), status='generated')
+    old = dict(material(offset=1), status='generated')
+    generation = certificate_generation(record)
+    _, candidate, leaf = current_material(lambda: record, generation, record['domain'])
+    arn = 'arn:aws:acm:us-east-1:123456789012:certificate/11111111-2222-3333-4444-555555555555'
+    session = boto3.Session(aws_access_key_id='synthetic', aws_secret_access_key='synthetic', region_name='us-east-1')
+    provider = AwsProvider({'certificate_arn': arn}, session)
+    def snapshot(pem):
+        value = x509.load_pem_x509_certificate(pem['cert'].encode())
+        return {'leaf': value, 'fingerprint': value.fingerprint(hashes.SHA256()).hex(),
+                'host': 'synthetic.cloudfront.net', 'material_sha256': material_digest(value, pem['chain'])}
+    with tempfile.TemporaryDirectory() as directory, Stubber(provider.acm) as stub:
+        # Strict exact expected params fail if ARN disappears, tags or any new
+        # option is introduced. Every SDK network request is intercepted.
+        expected = {'CertificateArn': arn, 'Certificate': candidate['cert'].encode(),
+                    'PrivateKey': candidate['key'].encode()}
+        if candidate['chain']: expected['CertificateChain'] = candidate['chain'].encode()
+        if outcome == 'denied':
+            stub.add_client_error('import_certificate', service_error_code='AccessDeniedException',
+                service_message='private provider detail', http_status_code=403, expected_params=expected)
+        else:
+            stub.add_response('import_certificate', {'CertificateArn': arn if outcome == 'accepted' else arn + 'wrong'}, expected)
+        ledger = Ledger(directory)
+        try:
+            with patch.object(provider, 'read', side_effect=[snapshot(old), snapshot(old), snapshot(record)]):
+                engine = Renewal({'target': {'certificate_arn': arn, 'domain': record['domain']},
+                    'poll_interval': 1, 'propagation_timeout': 5}, 'a' * 64, ledger, lambda: record,
+                    provider, lambda _record, seen: {'status': 'verified',
+                        'observed_fingerprint_sha256': seen['fingerprint']}, threading.Event())
+                if outcome == 'accepted':
+                    assert engine.run(generation)['status'] == 'verified'
+                else:
+                    try:
+                        engine.run(generation)
+                    except JobError as error:
+                        assert str(error) == 'import_outcome_uncertain'
+                    else:
+                        raise AssertionError('Uncertain receipt was accepted')
+                    assert ledger.read(arn)['state'] == 'quarantined'
+            stub.assert_no_pending_responses()
+        finally:
+            ledger.close(); provider.close()
+    print('PASS: offline-sdk-existing-arn-import-' + outcome)
+
+
 if __name__ == '__main__':
     exercise()
     exercise(denied=True)
+    for outcome in ('accepted', 'denied', 'wrong-receipt'):
+        exercise_import(outcome)

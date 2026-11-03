@@ -2,7 +2,6 @@
 from contextlib import redirect_stdout
 from copy import deepcopy
 from datetime import timedelta
-import importlib.util
 import io
 import json
 from pathlib import Path
@@ -16,10 +15,7 @@ from cryptography.hazmat.primitives.asymmetric import ec, rsa
 from import_fixture import material
 
 
-spec = importlib.util.spec_from_file_location(
-    'cloudfront_preflight', Path(__file__).parent / 'integration/cloudfront_preflight.py')
-preflight = importlib.util.module_from_spec(spec)
-spec.loader.exec_module(preflight)
+from certlord.cloudfront import preflight
 
 
 class CloudFrontPreflightTests(unittest.TestCase):
