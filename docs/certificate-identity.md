@@ -88,8 +88,8 @@ Full UUIDs are retained throughout storage and transport.
 The internal fingerprint is SHA-256 of versioned canonical JSON:
 `{"domains":["www.example.org"],"version":1}`. Domains are lowercased, represented
 as ASCII DNS labels, stripped of a terminal root dot, deduplicated and sorted.
-The HTTP endpoint still applies its existing domain schema and supports one distinct
-domain. This hash is not the UUID, a secret, an authentication token, the PEM
+Certificate API routes use the same normalization. For example, `École.Example.`
+and `xn--cole-9oa.example` resolve to the same identity. This hash is not the UUID, a secret, an authentication token, the PEM
 fingerprint or a private-key hash. No HMAC or pickle is used.
 
 Vault stores the definition and SHA-256 alongside the reserved UUID in

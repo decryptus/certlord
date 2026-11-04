@@ -24,7 +24,10 @@ def vault_settings(config):
     role, secret = setting('ROLE_ID'), setting('SECRET_ID')
     if (not token or token == '-') and not (role and secret):
         raise CertLordConfigError('Missing Vault AppRole credentials')
-    return {'url': url, 'token': token if token != '-' else None, 'role_id': role,
+    ca_bundle = creds.get('ca_bundle')
+    if ca_bundle is not None and (not isinstance(ca_bundle, str) or not os.path.isabs(ca_bundle)):
+        raise CertLordConfigError('Vault ca_bundle must be an absolute path')
+    return {'ca_bundle': ca_bundle, 'url': url, 'token': token if token != '-' else None, 'role_id': role,
             'secret_id': secret, 'key_name': key_name, 'mount': creds.get('mount', 'secret')}
 
 
@@ -35,7 +38,7 @@ def certificate_store(config):
     conf = vault_settings(config)
     auth = (VaultTokenAuth(conf['token']) if conf['token'] else
             VaultAppRoleAuth(conf['role_id'], conf['secret_id']))
-    return VaultCertificateStore(VaultSession(conf['url'], auth), conf['key_name'], conf['mount'])
+    return VaultCertificateStore(VaultSession(conf['url'], auth, ca_bundle=conf['ca_bundle']), conf['key_name'], conf['mount'])
 
 
 def api_access(config):
