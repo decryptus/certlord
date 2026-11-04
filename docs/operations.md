@@ -7,6 +7,13 @@ Use [installation](debian-installation.md), [ACME configuration](acme-connector.
 and [TLS verification](tls-verification.md) for setup. Keep operational information
 and credentials private.
 
+## Daemon startup
+
+When started as root, the daemon initializes supplementary groups for its target
+account before switching group and user. When systemd starts it as the service
+user, it retains the groups assigned by systemd. Daemon startup errors exit
+with a failure status so the supervisor can apply its restart policy.
+
 ## Command output limits
 
 Certbot and Auton commands may emit at most 4 MiB of combined standard output
@@ -203,6 +210,11 @@ Authentication remains owned by HTTPdis (401); denied operation permissions use
 state conflicts use 409, and busy/unavailable services use 503. Readiness retains
 its documented JSON health body and 503 when not ready. Framework parsing, route
 selection and unsupported-method behavior are separate contracts.
+
+The HTTP-01 challenge routes accept a trailing slash. Publication, lookup and
+cleanup use the same token-based Redis key. Before upgrading, let pending
+challenges published with a trailing slash finish or republish them after the
+upgrade. Existing keys published without a trailing slash remain readable.
 
 An absent challenge no longer returns empty HTTP 200. A Redis read failure is
 still 503 and must not be interpreted as absence. Successful and absent public challenge

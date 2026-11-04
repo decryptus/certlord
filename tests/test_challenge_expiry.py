@@ -25,10 +25,17 @@ class ChallengeExpiryTests(unittest.TestCase):
         request = Mock()
         path = '/.well-known/acme-challenge/' + 'a' * 43
         request.query_params.return_value = {'challenge': 'a' * 43}
-        request.get_path.return_value = path
+        request.get_path.return_value = path + '/'
         request.payload_params.return_value = 'a' * 43 + '.' + 'b' * 43
         module.well_known_put(request)
         module._redis.set_key.assert_called_once_with(path, request.payload_params.return_value, expire=23)
+        request.get_path.return_value = path
+        module._redis.get_key.return_value = b'proof'
+        self.assertEqual(module.well_known_get(request).data, b'proof')
+        module._redis.get_key.assert_called_once_with(path)
+        request.get_path.return_value = path + '/'
+        module.well_known_delete(request)
+        module._redis.del_key.assert_called_once_with(path)
 
     def test_invalid_retention_fails_before_connecting(self):
         for value in (None, True, False, 0, -1, 1.5, float('inf'), '30', 2147483648):

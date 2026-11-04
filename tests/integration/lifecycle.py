@@ -338,13 +338,13 @@ def authenticated_api_checks(config, directory, stack, env, phase, report):
     for credentials, expected in ((None, 401), (('reader', password), 403)):
         require(requests.put(challenge, json='fixture.proof', auth=credentials, timeout=5).status_code == expected,
                 'Challenge mutation was not protected')
-    require(requests.put(challenge, json='fixture.proof', auth=('operator', password), timeout=5).ok,
+    require(requests.put(challenge + '/', json='fixture.proof', auth=('operator', password), timeout=5).ok,
             'Authorized challenge creation rejected')
     response = requests.get(challenge, timeout=5)
     require(response.ok and response.text == 'fixture.proof', 'Public challenge GET requires credentials or changed data')
     require(requests.delete(challenge, auth=('reader', password), timeout=5).status_code == 403,
             'Read-only identity deleted challenge')
-    require(requests.delete(challenge, auth=('operator', password), timeout=5).ok,
+    require(requests.delete(challenge + '/', auth=('operator', password), timeout=5).ok,
             'Authorized challenge cleanup rejected')
     missing = requests.get(challenge, timeout=5)
     require(missing.status_code == 404 and missing.headers['Content-Type'].startswith('application/json'),
