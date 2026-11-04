@@ -1,5 +1,6 @@
 import copy
 import unittest
+from import_fixture import material
 from unittest.mock import Mock
 
 from certlord.ports.certificates import StorageConflict, StorageError, StorageNotFound
@@ -14,7 +15,7 @@ class SaveCoordinationTests(unittest.TestCase):
         self.backend.get_certificate_ids_for_domain.return_value = {'certificate_ids': ['6ff9418a-a4d7-5964-b0a3-78f920426989', '153e7019-20d1-563c-bbfd-0ce49b1f14f5']}
         self.backend.certificate_snapshot.return_value = ({'status': 'processing', 'issuance_id': 'a' * 64}, 3)
         self.service = CertificateService(self.backend)
-        self.payload = {'domain': 'one.example.test', 'cert': 'new', 'key': 'key'}
+        self.payload = material(('one.example.test',))
 
     def test_missing_target_preflight_prevents_all_writes(self):
         self.backend.certificate_snapshot.side_effect = [({'status': 'processing', 'issuance_id': 'a' * 64}, 3), StorageNotFound()]

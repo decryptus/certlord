@@ -138,6 +138,8 @@ class CertificateService(object):
         # Requests and their payloads remain owned by the transport.
         if not isinstance(issuance_id, str) or not re.fullmatch(r'[0-9a-f]{64}', issuance_id):
             raise CertificateConflict('Missing or invalid issuance identity')
+        # Keep the original PEM encoding for byte-for-byte retries of existing records.
+        validate_import(payload)
         data = dict(payload)
         domain = data.pop('domain').lower()
         data['issuance_id'] = issuance_id

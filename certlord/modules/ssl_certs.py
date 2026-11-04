@@ -14,7 +14,7 @@ from certlord.services.issuance import issuance_header
 from certlord.services.certificate_ids import valid_certificate_id
 from certlord.services.certificates import CertificateBusy, CertificateConflict, CertificateNotFound
 
-from certlord.services.import_material import InvalidMaterial
+from certlord.services.import_material import InvalidMaterial, LIMITS
 from certlord.services.observations import operations_metrics
 from certlord.services.tls_endpoints import endpoint_metrics
 
@@ -107,11 +107,11 @@ class SslCertsModule(DWhoModuleBase):
         return self._call_service(self._runtime.request_tls_check)
 
 
-    SAVE_PSCHEMA = xys.load("""
+    SAVE_PSCHEMA = xys.load(f"""
     domain: !~~callback(ssl_certs.sub_domain)
-    cert![1000,5000]: !!str
-    chain*[0,6000]: !!str
-    key![1000,5000]: !!str
+    cert![1,{LIMITS["cert"]}]: !!str
+    chain*[0,{LIMITS["chain"]}]: !!str
+    key![1,{LIMITS["key"]}]: !!str
     """)
 
     def save(self, request):

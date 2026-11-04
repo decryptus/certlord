@@ -37,6 +37,11 @@ existing command builder supplies a PATH-only environment in that mode.
 Leave `param_challenge` and `param_validation` unset. CertLord expects the token
 in the route and a JSON string body, not a nested validation object. Leave the
 deployment field names unchanged. Certificate callbacks include the private key.
+Before saving, CertLord checks that the leaf certificate is currently valid,
+its single DNS SAN matches the requested domain, and the private key matches
+the leaf (RSA ≥ 2048 bits or EC ≥ 256 bits). If a chain is supplied, CertLord
+checks its consistency. Invalid material returns HTTP 400 before storage.
+Retry the current issuance with the same PEM content after an uncertain response.
 
 `modules.letsencrypt.challenge_ttl` is a positive integer number of seconds,
 default 3600 (maximum 2147483647). Publication uses Redis SETEX so a client crash
