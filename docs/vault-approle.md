@@ -31,12 +31,19 @@ In the protected credentials YAML:
 ```yaml
 vault:
   uri: https://vault.example.invalid
+  # ca_bundle: /etc/certlord/vault-ca.pem
   mount: secret
   key_name: certlord-certificates
   token: '-'
   role_id: '<provisioned-role-id>'
   secret_id: '<provisioned-secret-id>'
 ```
+
+For Vault HTTPS with a private CA, set `vault.ca_bundle` to the absolute path
+of a PEM bundle readable by the service account, or set `VAULT_CACERT` in
+its environment before startup. When the YAML option is omitted, hvac also
+supports `VAULT_CAPATH` (a hashed CA directory) and otherwise uses its normal
+TLS trust settings. Restart CertLord after changing these settings.
 
 The explicit `token: '-'` selects AppRole even if `VAULT_TOKEN` is present.
 Keep the credentials file restricted to the service account and provide trusted

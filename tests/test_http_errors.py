@@ -73,6 +73,21 @@ class HttpErrorTests(unittest.TestCase):
                 self.assertEqual(error.exception.code, 400)
                 self.assertEqual(module._service.mock_calls, [])
 
+    def test_domain_validation_uses_canonical_name_for_dns(self):
+        from certlord.services.certificates import CertificateService
+        backend = Mock()
+        module = SslCertsModule()
+        module._api_access, module._service = Mock(), CertificateService(backend)
+        request = Mock()
+        request.query_params.return_value = {'sub_domain': 'École.Example.'}
+        self.assertTrue(module.validate(request))
+        backend.check_dns_resolv.assert_called_once_with('xn--cole-9oa.example')
+        request.query_params.return_value = {'sub_domain': 'bad/label.example'}
+        with self.assertRaises(HttpReqErrJson) as error:
+            module.validate(request)
+        self.assertEqual(error.exception.code, 400)
+        self.assertEqual(backend.check_dns_resolv.call_count, 1)
+
     def test_metrics_formatting_failure_uses_safe_service_error(self):
         module = SslCertsModule()
         module._api_access, module._runtime = Mock(), Mock()

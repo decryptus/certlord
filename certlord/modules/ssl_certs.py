@@ -5,7 +5,8 @@ import logging
 from dwho.classes.modules import DWhoModuleBase, MODULES
 from httpdis.ext.httpdis_json import HttpReqErrJson
 from httpdis.httpdis import HttpResponse, HttpResponseJson
-from sonicprobe.libs import network, xys
+from sonicprobe.libs import xys
+from certlord.services.identity_definition import valid_domain
 from certlord.composition import api_access, certificate_runtime
 from certlord.configuration_schema import validate_configuration
 from certlord.modules.route_auth import authenticated_routes
@@ -20,8 +21,7 @@ from certlord.services.tls_endpoints import endpoint_metrics
 
 LOG = logging.getLogger(__name__)
 xys.add_callback('ssl_certs.certificate_id', valid_certificate_id)
-xys.add_callback('ssl_certs.sub_domain',
-                 lambda x: network.valid_domain_cert(x, network.MASK_SUB_DOMAIN_TLD))
+xys.add_callback('ssl_certs.sub_domain', valid_domain)
 
 class SslCertsModule(DWhoModuleBase):
     MODULE_NAME = 'ssl_certs'

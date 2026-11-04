@@ -10,7 +10,7 @@ from certlord.services.operation_tracking import tracked, record_id
 import re
 import secrets
 from uuid import uuid4
-from certlord.services.identity_definition import identity_definition, identity_fingerprint
+from certlord.services.identity_definition import canonical_domain, identity_definition, identity_fingerprint
 from certlord.services.import_material import validate_import, InvalidMaterial
 from certlord.services.deployment import deployment_metadata, destination_state, DESTINATION_NAME
 
@@ -115,11 +115,11 @@ class CertificateService(object):
 
     def validate(self, domain):
         with self._lock():
-            self._validate_domain(domain.lower())
+            self._validate_domain(canonical_domain(domain))
             return True
 
     def begin_issuance(self, domain):
-        domain = domain.lower()
+        domain = canonical_domain(domain)
         attempt = secrets.token_hex(32)
         with self._lock(write=True):
             certificate_ids = self.backend.get_certificate_ids_for_domain(domain).get('certificate_ids', [])
@@ -139,9 +139,10 @@ class CertificateService(object):
         if not isinstance(issuance_id, str) or not re.fullmatch(r'[0-9a-f]{64}', issuance_id):
             raise CertificateConflict('Missing or invalid issuance identity')
         # Keep the original PEM encoding for byte-for-byte retries of existing records.
-        validate_import(payload)
+        definition, _ = validate_import(payload)
         data = dict(payload)
-        domain = data.pop('domain').lower()
+        del data['domain']
+        domain = definition['domains'][0]
         data['issuance_id'] = issuance_id
         data['issuance_complete'] = True
         data['chain'] = data.get('chain') or ''
@@ -245,7 +246,7 @@ class CertificateService(object):
 
     def upsert(self, certificate_id, domains):
         certificate_id = require_certificate_id(certificate_id)
-        desired = set(domain.lower() for domain in domains)
+        desired = {canonical_domain(domain) for domain in domains}
         if len(desired) > 1:
             raise CertificateConflict('One domain per certificate is currently supported')
         backend = self.backend

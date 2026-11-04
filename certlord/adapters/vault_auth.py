@@ -23,8 +23,8 @@ class VaultAppRoleAuth(object):
 
 
 class VaultSession(StorageSession):
-    def __init__(self, url, authenticator, client_factory=hvac.Client):
-        self._client = client_factory(url=url, timeout=10)
+    def __init__(self, url, authenticator, client_factory=hvac.Client, *, ca_bundle=None):
+        self._client = client_factory(url=url, timeout=10, verify=ca_bundle)
         self._authenticator = authenticator
         self._lock = threading.RLock()
 

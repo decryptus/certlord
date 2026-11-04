@@ -93,6 +93,18 @@ class BoundaryTests(unittest.TestCase):
         with self.assertRaises(AccessDenied):
             ApiAccess({'reader': ['read']}).require('unknown', 'read')
 
+    def test_vault_ca_bundle_is_scoped_to_storage_and_cannot_disable_tls(self):
+        from certlord.composition import certificate_store
+        from certlord.classes.exceptions import CertLordConfigError
+        vault = {'uri': 'https://vault.example.org', 'key_name': 'certs', 'token': 'test'}
+        config = {'credentials': {'vault': vault}}
+        vault['ca_bundle'] = '/etc/certlord/ca.pem'
+        store = certificate_store(config)
+        self.assertEqual(store._session._client.adapter.session.verify, vault['ca_bundle'])
+        for invalid in (False, '', 'relative.pem'):
+            with self.subTest(invalid=invalid), self.assertRaises(CertLordConfigError):
+                certificate_store({'credentials': {'vault': dict(vault, ca_bundle=invalid)}})
+
     def test_local_api_mode_rejects_network_listener(self):
         with self.assertRaises(Exception):
             api_access({'general': {'listen_addr': '0.0.0.0'}, 'api_authentication': {'backend': 'local'}})
