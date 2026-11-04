@@ -146,13 +146,16 @@ def main(options):
         LOG.info("pidfile ok")
         root_logger.setLevel(options.loglevel)
         os.chown(options.pidfile, uid, gid)
+        if os.geteuid() == 0:
+            os.initgroups(options.username, gid)
         os.setgid(gid)
         os.setuid(uid)
         httpdis_json.run(options)
-    except (KeyboardInterrupt, SystemExit):
+    except KeyboardInterrupt:
         pass
     except Exception:
-        LOG.exception("bad things happen")
+        LOG.exception("CertLord daemon failed")
+        sys.exit(1)
     finally:
         daemonize.unlock_pidfile(options.pidfile)
 

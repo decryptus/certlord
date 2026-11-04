@@ -25,6 +25,10 @@ RE_VALIDATION_MATCH = re.compile(r'[0-9A-Za-z_\-\.]+').fullmatch
 
 xys.add_regex('letsencrypt.challenge', re.compile(r'[0-9A-Za-z_\-]{43}').fullmatch)
 
+def challenge_key(params):
+    return '/.well-known/acme-challenge/' + params['challenge']
+
+
 class LetsEncryptModule(DWhoModuleBase):
     MODULE_NAME = 'letsencrypt'
 
@@ -74,7 +78,7 @@ class LetsEncryptModule(DWhoModuleBase):
             raise HttpReqErrJson(503, "unable to take LOCK for writing after %s seconds" % self.lock_timeout)
 
         try:
-            self._redis.del_key(request.get_path())
+            self._redis.del_key(challenge_key(params))
             return ""
         except HttpReqErrJson:
             raise
@@ -102,7 +106,7 @@ class LetsEncryptModule(DWhoModuleBase):
             raise HttpReqErrJson(503, "unable to take LOCK for reading after %s seconds" % self.lock_timeout)
 
         try:
-            value = self._redis.get_key(request.get_path())
+            value = self._redis.get_key(challenge_key(params))
             if value is None:
                 raise HttpReqErrJson(404, 'Challenge not found', headers={'Cache-Control': 'no-store'})
             return HttpResponse(data=value, headers={'Cache-Control': 'no-store'})
@@ -140,7 +144,7 @@ class LetsEncryptModule(DWhoModuleBase):
             raise HttpReqErrJson(503, "unable to take LOCK for writing after %s seconds" % self.lock_timeout)
 
         try:
-            self._redis.set_key(request.get_path(), payload, expire=self.challenge_ttl)
+            self._redis.set_key(challenge_key(params), payload, expire=self.challenge_ttl)
             return ""
         except HttpReqErrJson:
             raise
