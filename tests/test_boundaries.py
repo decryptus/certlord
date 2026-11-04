@@ -105,6 +105,14 @@ class BoundaryTests(unittest.TestCase):
             with self.subTest(invalid=invalid), self.assertRaises(CertLordConfigError):
                 certificate_store({'credentials': {'vault': dict(vault, ca_bundle=invalid)}})
 
+    def test_vault_client_factory_can_supply_its_own_trust_policy(self):
+        def client_factory(**kwargs):
+            return hvac.Client(verify='/profile/ca.pem', **kwargs)
+
+        session = VaultSession('https://vault.example.org', VaultAppRoleAuth('role', 'secret'),
+                               client_factory=client_factory)
+        self.assertEqual(session._client.adapter.session.verify, '/profile/ca.pem')
+
     def test_local_api_mode_rejects_network_listener(self):
         with self.assertRaises(Exception):
             api_access({'general': {'listen_addr': '0.0.0.0'}, 'api_authentication': {'backend': 'local'}})
