@@ -1,5 +1,5 @@
 """API authorization uses identities, never storage credentials."""
-API_OPERATIONS = frozenset(('read', 'write', 'deploy', 'challenge'))
+API_OPERATIONS = frozenset(('read', 'write', 'deploy', 'challenge', 'issue'))
 
 
 class AccessDenied(Exception):
@@ -13,6 +13,10 @@ class ApiAccess(object):
             raise ValueError('Unknown API permission')
 
     def require(self, principal, operation):
-        if operation not in API_OPERATIONS or operation not in self._permissions.get(principal, ()):
+        granted = self._permissions.get(principal, ())
+        # Existing writers retain the ACME callback after upgrades.
+        if operation == 'issue' and 'write' in granted:
+            return principal
+        if operation not in granted:
             raise AccessDenied('API operation not permitted')
         return principal

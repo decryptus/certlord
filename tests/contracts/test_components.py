@@ -10,7 +10,8 @@ import yaml
 import unittest
 from unittest.mock import Mock, patch
 
-from certlord.composition import vault_settings
+from certlord.composition import api_access, vault_settings
+from certlord.configuration_schema import validate_configuration
 from certlord.modules.ssl_certs import SslCertsModule
 from certlord.modules.letsencrypt import LetsEncryptModule
 from certlord.services.certificates import CertificateConflict, CertificateNotFound, CertificateBusy
@@ -42,6 +43,23 @@ class ComponentContracts(unittest.TestCase):
             self.module.save(request)
         self.assertEqual(caught.exception.code, 400)
         self.module._service.save.assert_not_called()
+
+    def test_connector_cannot_administer_certificates(self):
+        conf = {'general': {}, 'api_authentication': {'permissions': {
+            'connector': ['issue', 'challenge'], 'challenge-only': ['challenge']}}}
+        self.module._api_access = api_access(validate_configuration(conf))
+        request = Mock()
+        request.get_server_vars.return_value = {'HTTP_AUTH_USER': 'connector'}
+        for handler in ('create', 'upsert', 'import_certificate', 'replace_import', 'remove',
+                        'deploy', 'inventory', 'check_tls_endpoints', 'retry_destination'):
+            with self.subTest(handler=handler), self.assertRaises(HttpReqErrJson) as error:
+                getattr(self.module, handler)(request)
+            self.assertEqual(error.exception.code, 403)
+        request.get_server_vars.return_value = {'HTTP_AUTH_USER': 'challenge-only'}
+        with self.assertRaises(HttpReqErrJson) as error:
+            self.module.save(request)
+        self.assertEqual(error.exception.code, 403)
+        self.assertFalse(self.module._service.mock_calls)
 
     def test_upsert_route_delegates_validated_inputs(self):
         request = Mock()
@@ -130,8 +148,14 @@ class ComponentContracts(unittest.TestCase):
         request = Mock()
         request.payload_params.return_value = payload
         request.get_headers.return_value = {'X-CertLord-Issuance': 'a' * 64}
-        self.module.save(request)
-        self.module._service.save.assert_called_once_with(payload, 'a' * 64)
+        conf = {'general': {}, 'api_authentication': {'permissions': {
+            'connector': ['issue', 'challenge'], 'legacy': ['write']}}}
+        self.module._api_access = api_access(validate_configuration(conf))
+        for principal in ('connector', 'legacy'):
+            request.get_server_vars.return_value = {'HTTP_AUTH_USER': principal}
+            self.module.save(request)
+            self.module._service.save.assert_called_once_with(payload, 'a' * 64)
+            self.module._service.save.reset_mock()
         post.return_value.raise_for_status.assert_called_once()
 
     @patch('acme_http_connector.connector.requests.put')

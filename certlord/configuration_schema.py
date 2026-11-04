@@ -29,7 +29,7 @@ backend?: !~~enum(httpdis,local) ''
 permissions*: %s
 ''' % MAPPING)
 STORAGE_SCHEMA = xys.load("backend?: !~~enum(vault) ''")
-PERMISSIONS_SCHEMA = xys.load('[ !~~enum(read,write,deploy,challenge) "" ]')
+PERMISSIONS_SCHEMA = xys.load('[ !~~enum(read,write,deploy,challenge,issue) "" ]')
 CHECKER_SCHEMA = xys.load('enabled?: false')
 MODULE_SCHEMA = xys.load('''
 auton?: %s
