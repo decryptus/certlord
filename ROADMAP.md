@@ -1,15 +1,23 @@
 # CertLord roadmap
 
-Updated: 2026-11-04. Published stable release: 1.2.0.
+Updated: 2026-11-04. Published stable release: 1.3.0.
 
-## Prepared for release — 1.3.0
+## Delivered — 1.3.0
 
 Review fixes from PRs #17–#21 are merged on main. The 337 unit and component
 cases and the installed lifecycle gates passed on the final review revision.
 This release adds restricted ACME issuance permissions, filtered Certbot
 environments, service startup and HTTP-01 fixes, canonical domain validation
 and per-service Vault CA configuration. See the [release notes](docs/release-notes.md)
-for upgrade steps. Registry publication and product website rollout are pending.
+for upgrade steps. [Release #22](https://github.com/decryptus/certlord/pull/22) shipped at tag
+[v1.3.0](https://github.com/decryptus/certlord/releases/tag/v1.3.0). The downloaded
+PyPI wheel and sdist match the GitHub release SHA-256 digests. Docker Hub tags
+1.3.0 and latest share manifest
+`sha256:bb3fd26d1670a49a42a56cecff76624d3727206c0c4b4c493f6ab34e0ea37a09`
+for Linux amd64 and arm64. The registry description matches the tagged source.
+[Website PR #25](https://github.com/decryptus/atraxis-site/pull/25) deployed
+the French and English pages. Both public pages serve the versioned installation
+command and migration guide.
 
 ## Implemented — experimental AWS / CloudFront connector
 
