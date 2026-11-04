@@ -22,8 +22,18 @@ For another location, pass both `--certbot-httpreq:auth-config` and
 `--certbot-httpreq:installer-config` in the configured Certbot argument list.
 An explicit `modules.ssl_certs.certbot.args` replaces the entire default list;
 retain the authenticator, installer, non-interactive flags and `run` subcommand.
-Do not rely on environment-only configuration when using `search_paths`: the
-existing command builder supplies a PATH-only environment in that mode.
+Certbot and its hooks receive a filtered environment. The default includes
+PATH, HOME, LANG, LC_ALL, LC_CTYPE, TMPDIR, HTTP/HTTPS/ALL/NO proxy variables
+(upper and lower case), REQUESTS_CA_BUNDLE, CURL_CA_BUNDLE, SSL_CERT_FILE,
+SSL_CERT_DIR and the two connector paths CBT_HTTPREQ_AUTH_CONFIG and
+CBT_HTTPREQ_INST_CONFIG. For a DNS plugin or hook that requires another
+variable, list its exact name under `modules.ssl_certs.certbot.pass_env`, for
+example `pass_env: [DNS_API_TOKEN]`. Values come from the daemon environment
+and become available to the Certbot process and its hooks. Prefer the connector
+YAML for phase-specific options such as CBT_HTTPREQ_DEPLOY_URI.
+
+With `search_paths` configured, only the configured PATH and variables named
+in `pass_env` are forwarded. Include REQUESTS_CA_BUNDLE there if needed.
 
 ## Connector permissions
 

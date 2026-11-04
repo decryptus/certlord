@@ -119,9 +119,22 @@ modules:
       #args: []
     certbot:
       become:
-        enabled: true
-      #search_paths: []
-      #args: []
+        enabled: false
+      args:
+        - --agree-tos
+        - --text
+        - --non-interactive
+        - --config-dir
+        - /var/lib/certlord/certbot/config
+        - --work-dir
+        - /var/lib/certlord/certbot/work
+        - --logs-dir
+        - /var/lib/certlord/certbot/logs
+        - -a
+        - certbot-httpreq:auth
+        - -i
+        - certbot-httpreq:installer
+        - run
     routes:
       live:
         handler: live
