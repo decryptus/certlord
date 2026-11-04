@@ -2,11 +2,21 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 """Build argv and explicit subprocess environments without running commands."""
 import os
+import re
 
 from certlord.classes.config import (AUTON_PROG, CERTBOT_PROG,
                                     DEFAULT_BECOME_METHOD, DEFAULT_BECOME_OPTS,
                                     DEFAULT_BECOME_USER, DEFAULT_CERTBOT_ARGS)
 from certlord.classes.exceptions import CertLordConfigError
+
+
+CERTBOT_ENV = (
+    'PATH', 'HOME', 'LANG', 'LC_ALL', 'LC_CTYPE', 'TMPDIR',
+    'HTTP_PROXY', 'HTTPS_PROXY', 'ALL_PROXY', 'NO_PROXY',
+    'http_proxy', 'https_proxy', 'all_proxy', 'no_proxy',
+    'REQUESTS_CA_BUNDLE', 'CURL_CA_BUNDLE', 'SSL_CERT_FILE', 'SSL_CERT_DIR',
+    'CBT_HTTPREQ_AUTH_CONFIG', 'CBT_HTTPREQ_INST_CONFIG',
+)
 
 
 class CommandBuilder(object):
@@ -37,28 +47,27 @@ class CommandBuilder(object):
         if isinstance(self.modconf.get('certbot'), dict):
             conf = self.modconf['certbot']
 
-        r = {'args': self._get_become(conf.get('become')) + [CERTBOT_PROG],
-             'env':  None}
+        args = conf.get('args', DEFAULT_CERTBOT_ARGS)
+        if not isinstance(args, list):
+            raise CertLordConfigError("invalid certbot args configuration")
 
-        if not conf:
-            r['args'] += DEFAULT_CERTBOT_ARGS
-            return r
+        extra = conf.get('pass_env', [])
+        if not isinstance(extra, list) or any(not isinstance(name, str) or not
+                re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', name) for name in extra):
+            raise CertLordConfigError("certbot pass_env requires a list of environment variable names")
 
-        if 'args' not in conf:
-            r['args'] += DEFAULT_CERTBOT_ARGS
-        else:
-            if not isinstance(conf['args'], list):
-                raise CertLordConfigError("invalid certbot args configuration")
-
-            r['args'] += conf['args']
-
+        names = set(extra)
+        if 'search_paths' not in conf:
+            names.update(CERTBOT_ENV)
+        env = {name: os.environ[name] for name in names if name in os.environ}
         if 'search_paths' in conf:
-            if not isinstance(conf['search_paths'], list):
+            paths = conf['search_paths']
+            if not isinstance(paths, list) or not all(isinstance(path, str) for path in paths):
                 raise CertLordConfigError("invalid certbot search_paths configuration")
+            env['PATH'] = os.path.pathsep.join(paths)
 
-            r['env'] = {'PATH': os.path.pathsep.join(conf['search_paths'])}
-
-        return r
+        return {'args': self._get_become(conf.get('become')) + [CERTBOT_PROG] + args,
+                'env': env}
 
     def _get_auton_cred(self):
         if self._auton_cred:

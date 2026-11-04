@@ -221,3 +221,18 @@ Merge the three `/api/tls-endpoints` routes from the supplied configuration into
 existing installations; route configuration is operator-owned and is not replaced
 automatically on upgrade. Configure `modules.ssl_certs.tls_monitoring` and restart.
 See [TLS endpoints](docs/tls-endpoints.md) for permissions and fingerprint rotation.
+
+## Certbot environment and service account
+
+Before upgrading, check which environment variables your DNS plugin, HTTP connector
+and hooks use. Put additional names in `modules.ssl_certs.certbot.pass_env` on
+the new version and restart CertLord. See the [connector guide](docs/acme-connector.md)
+for the default list and behavior with a custom PATH.
+
+The new Debian example uses the certlord account and keeps Certbot state under
+`/var/lib/certlord/certbot`. Existing configurations retain their selected user
+and directories. For an existing installation with root-owned state, keep its
+current settings until you have backed up the Certbot configuration, account and
+lineages, migrated them with their symlinks intact, and verified access to the
+connector configuration and hooks as the service account. Check renewal against
+staging before switching scheduled issuance.

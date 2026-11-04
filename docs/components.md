@@ -24,10 +24,9 @@ Redis prefixes `cert:` and `domain:` are retained. New deployments use
 deterministic `deploy:` keys and owner-token `deployment-lock:` leases.
 ACME Redis keys remain the request path. Workers retain their existing module
 facade methods. Auton credentials remain in the subprocess environment, not
-argv. The existing explicit environment behavior is retained: Auton receives
-its credential environment (plus optional PATH), and Certbot with `search_paths`
-receives a PATH-only environment. Environment inheritance needs a deliberate
-policy before changing it, especially for proxies and plugin configuration.
+argv. Auton receives its credential environment and optional PATH.
+Certbot receives only its [documented environment](acme-connector.md) and
+explicitly configured plugin or hook variables.
 
 ## Current compatibility and unresolved risks
 

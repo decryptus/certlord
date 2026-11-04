@@ -27,6 +27,22 @@ class CommandTests(unittest.TestCase):
         command = self.builder({'certbot': {'args': ['renew']}}).certbot_cmd()
         self.assertEqual(command['args'], ['certbot', 'renew'])
 
+    @patch.dict('os.environ', {'PATH': '/usr/bin', 'REQUESTS_CA_BUNDLE': '/private/ca.pem',
+                                'AUTON_AUTH_PASSWD': 'private', 'VAULT_TOKEN': 'private',
+                                'PLUGIN_TOKEN': 'scoped'}, clear=True)
+    def test_certbot_environment_is_explicit_even_with_sudo(self):
+        for options in ({}, {'become': {'enabled': True}}):
+            env = self.builder({'certbot': options}).certbot_cmd()['env']
+            self.assertEqual(env, {'PATH': '/usr/bin', 'REQUESTS_CA_BUNDLE': '/private/ca.pem'})
+        options = {'search_paths': ['/opt/bin'], 'pass_env': ['PLUGIN_TOKEN', 'ABSENT']}
+        env = self.builder({'certbot': options}).certbot_cmd()['env']
+        self.assertEqual(env, {'PATH': '/opt/bin', 'PLUGIN_TOKEN': 'scoped'})
+
+    def test_certbot_rejects_invalid_pass_env(self):
+        for value in ('PLUGIN_TOKEN', ['*'], ['TOKEN=value'], [42]):
+            with self.subTest(value=value), self.assertRaises(CertLordConfigError):
+                self.builder({'certbot': {'pass_env': value}}).certbot_cmd()
+
     def test_sudo_arguments_remain_explicit(self):
         command = self.builder({'certbot': {'become': {'enabled': True}}}).certbot_cmd()
         self.assertEqual(command['args'][:6], ['sudo', '-H', '-E', '-u', 'root', 'certbot'])
