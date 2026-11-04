@@ -1,3 +1,13 @@
+certlord (1.3.0) stable; urgency=medium
+
+  * Validate ACME callbacks, support ECDSA and add the issue permission.
+  * Restrict the Certbot environment and harden daemon startup.
+  * Normalize certificate domains and HTTP-01 challenge keys.
+  * Bind the Debian example to loopback and support a dedicated Vault CA.
+  * Include the opt-in experimental CloudFront renewal job.
+
+ -- Adrien Delle Cave <pypi@doowan.net>  Wed, 04 Nov 2026 19:00:00 +0000
+
 certlord (1.2.0) stable; urgency=medium
 
   * Add independent TLS endpoint checks with explicit connection host and TLS name.

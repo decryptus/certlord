@@ -1,6 +1,15 @@
 # CertLord roadmap
 
-Updated: 2026-11-03. Published stable release: 1.2.0.
+Updated: 2026-11-04. Published stable release: 1.2.0.
+
+## Prepared for release — 1.3.0
+
+Review fixes from PRs #17–#21 are merged on main. The 337 unit and component
+cases and the installed lifecycle gates passed on the final review revision.
+This release adds restricted ACME issuance permissions, filtered Certbot
+environments, service startup and HTTP-01 fixes, canonical domain validation
+and per-service Vault CA configuration. See the [release notes](docs/release-notes.md)
+for upgrade steps. Registry publication and product website rollout are pending.
 
 ## Implemented — experimental AWS / CloudFront connector
 
