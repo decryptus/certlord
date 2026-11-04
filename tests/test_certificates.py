@@ -1,4 +1,5 @@
 import unittest
+from import_fixture import material
 from unittest.mock import Mock
 from certlord.classes.config import STATUS_DELETE, STATUS_EXISTS, STATUS_PROCESSING
 from certlord.classes.ssl_cert_auto_object import SslCertAutoObject
@@ -47,7 +48,8 @@ class CertificateServiceTests(unittest.TestCase):
         self.backend.CERTIFICATES_LOCK.release.assert_called_once_with('6ff9418a-a4d7-5964-b0a3-78f920426989')
 
     def test_save_missing_domain_reports_not_found(self):
-        payload = {'domain': 'Example.org', 'cert': 'cert', 'key': 'key'}
+        payload = material(('Example.org',))
+        del payload['chain']
         with self.assertRaises(CertificateNotFound) as caught:
             self.service.save(payload, 'a' * 64)
         self.assertIn('example.org', str(caught.exception))
@@ -57,7 +59,8 @@ class CertificateServiceTests(unittest.TestCase):
     def test_save_preserves_input_and_notifies_crawler(self):
         self.backend.get_certificate_ids_for_domain.side_effect = None
         self.backend.get_certificate_ids_for_domain.return_value = {'certificate_ids': ['6ff9418a-a4d7-5964-b0a3-78f920426989']}
-        payload = {'domain': 'Example.org', 'cert': 'cert', 'key': 'key'}
+        payload = material(('Example.org',))
+        del payload['chain']
         self.service.save(payload, 'a' * 64)
         self.assertNotIn('status', payload)
         self.assertNotIn('chain', payload)

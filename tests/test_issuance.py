@@ -2,9 +2,13 @@ import copy
 from pathlib import Path
 import tempfile
 import unittest
+from import_fixture import material
 from unittest.mock import Mock
 
 import yaml
+from httpdis.ext.httpdis_json import HttpReqErrJson
+from certlord.modules.ssl_certs import SslCertsModule
+from certlord.services.runtime import CertificateRuntime
 from certlord.adapters.issuance_command import issuance_command
 from certlord.classes.config import CERTBOT_INSTALLER_CONFIG_OPTION, ISSUANCE_HEADER
 from certlord.services.certificates import CertificateService, CertificateConflict
@@ -19,7 +23,7 @@ class IssuanceTests(unittest.TestCase):
         self.current = {'status': 'processing', 'issuance_id': 'a' * 64}
         self.backend.certificate_snapshot.side_effect = lambda *args: (dict(self.current), 3)
         self.service = CertificateService(self.backend)
-        self.payload = {'domain': 'one.example.test', 'cert': 'cert', 'key': 'key', 'chain': ''}
+        self.payload = material(('one.example.test',))
 
     def test_missing_identity_fails_before_storage(self):
         with self.assertRaises(CertificateConflict):
@@ -48,7 +52,7 @@ class IssuanceTests(unittest.TestCase):
     def test_duplicate_callback_cannot_change_already_accepted_material(self):
         self.current.update(self.payload, issuance_complete=True)
         with self.assertRaises(CertificateConflict):
-            self.service.save(dict(self.payload, cert='different'), 'a' * 64)
+            self.service.save(material(('one.example.test',)), 'a' * 64)
         self.backend.save_certificate.assert_not_called()
 
     def test_matching_identity_is_persisted_with_accepted_material(self):
@@ -57,6 +61,40 @@ class IssuanceTests(unittest.TestCase):
         self.assertEqual(saved['issuance_id'], 'a' * 64)
         self.assertTrue(saved['issuance_complete'])
         self.assertNotIn('issuance_id', self.payload)
+
+    def test_http_save_accepts_p256_and_replay_preserves_deployed_version(self):
+        module = SslCertsModule()
+        module._api_access = Mock()
+        module._service = self.service
+        runtime = CertificateRuntime.__new__(CertificateRuntime)
+        runtime._store = Mock()
+        self.backend.save_certificate.side_effect = runtime.save_certificate
+        request = Mock()
+        request.get_headers.return_value = {ISSUANCE_HEADER: 'a' * 64}
+        request.payload_params.return_value = self.payload
+        module.save(request)
+        saved = runtime._store.replace_if_version.call_args.args[-1]
+        self.assertEqual(saved['key'], self.payload['key'])
+        self.current.update(saved, status='deployed')
+        runtime._store.replace_if_version.reset_mock()
+        module.save(request)
+        runtime._store.replace_if_version.assert_not_called()
+
+    def test_http_save_rejects_mismatched_material_before_storage(self):
+        module = SslCertsModule()
+        module._api_access = Mock()
+        module._service = self.service
+        request = Mock()
+        request.get_headers.return_value = {ISSUANCE_HEADER: 'a' * 64}
+        for changes in ({'key': material()['key']}, {'domain': 'wrong.example.test'},
+                        {'cert': 'C' * 1200, 'key': 'K' * 1200}):
+            with self.subTest(fields=tuple(changes)):
+                request.payload_params.return_value = dict(self.payload, **changes)
+                with self.assertRaises(HttpReqErrJson) as caught:
+                    module.save(request)
+                self.assertEqual(caught.exception.code, 400)
+                self.backend.get_certificate_ids_for_domain.assert_not_called()
+                self.backend.save_certificate.assert_not_called()
 
     def test_header_case_and_duplicate_handling(self):
         self.assertEqual(issuance_header({'x-certlord-issuance': 'a'}), 'a')

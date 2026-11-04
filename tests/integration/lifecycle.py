@@ -602,7 +602,7 @@ path "secret/metadata/save-fixture/*" { capabilities = ["list"] }
                 'Retry failed to finish the previously denied certificate_id')
         phase('partial-multisite-save-retains-success-and-retry-preserves-deployed-copy')
         try:
-            runtime.service.save(dict(payload, cert='different'), attempt)
+            runtime.service.save(dict(payload, chain=''), attempt)
         except CertificateConflict:
             pass
         else:
