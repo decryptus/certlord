@@ -20,7 +20,7 @@ api_authentication:
   permissions: {}
   # permissions:
   #   operator: [read, write, deploy]
-  #   acme-connector: [write, challenge]
+  #   acme-connector: [issue, challenge]
 certificate_storage:
   backend: vault
 credentials: credentials.yml

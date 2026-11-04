@@ -82,7 +82,7 @@ def initialize(args, client):
                         for name, db in (('letsencrypt', 0), ('ssl_certs', 1))}
     config['credentials'] = '/etc/certlord/credentials.yml'
     config['api_authentication'] = {'backend': 'httpdis', 'permissions': {
-        'operator': ['read', 'write', 'deploy'], 'connector': ['write', 'challenge'], 'reader': ['read']}}
+        'operator': ['read', 'write', 'deploy'], 'connector': ['issue', 'challenge'], 'reader': ['read']}}
     module = config['modules']['ssl_certs']
     module['certbot'] = {'become': {'enabled': False}, 'args': [
         '--non-interactive', '--agree-tos', '--email', args.email,

@@ -49,13 +49,20 @@ Managed storage paths are documented in the [identity guide](docs/certificate-id
 ## API authentication and infrastructure separation
 
 Certificate routes now authenticate through HTTPdis and then check explicit
-`api_authentication.permissions` (`read`, `write`, `deploy`, `challenge`).
+`api_authentication.permissions` (`read`, `write`, `deploy`, `challenge`, `issue`).
 An empty permission map denies access. Configure HTTPdis credentials separately
-from Vault credentials; give the ACME connector challenge/write permissions and
+from Vault credentials; give the ACME connector `issue` and `challenge` permissions and
 send its API credentials on its callbacks. Public challenge GET remains public.
 For disposable development only, `api_authentication.backend: local` permits
 unauthenticated calls when `general.listen_addr` is exactly `127.0.0.1` or `::1`.
 Do not expose that listener through an unprotected proxy.
+
+Upgrade all CertLord daemons before introducing `issue` in shared configuration.
+Older versions reject unknown permission names. Existing `write` grants continue
+to authorize the save callback after upgrade. To restrict an existing connector,
+replace `write` with `issue` in its permission list, keep `challenge`, and
+restart CertLord. Apply the same edit to previously generated Compose
+configuration. If rolling back, restore the old permission list first.
 
 `VAULT_ADDR` is supported as the standard address variable. Explicit YAML values
 win over environment values.

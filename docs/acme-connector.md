@@ -25,6 +25,21 @@ retain the authenticator, installer, non-interactive flags and `run` subcommand.
 Do not rely on environment-only configuration when using `search_paths`: the
 existing command builder supplies a PATH-only environment in that mode.
 
+## Connector permissions
+
+Give the HTTPdis identity used by Certbot these two permissions in the CertLord configuration:
+
+```yaml
+api_authentication:
+  backend: httpdis
+  permissions:
+    acme-connector: [issue, challenge]
+```
+
+`issue` authorizes the save callback for a current issuance attempt.
+`challenge` authorizes publication and cleanup of HTTP-01 tokens.
+Use the actual HTTPdis username and retain the entries for other API users.
+
 ## Route contracts
 
 | Phase | Request | CertLord behavior |

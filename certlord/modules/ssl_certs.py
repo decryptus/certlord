@@ -115,7 +115,7 @@ class SslCertsModule(DWhoModuleBase):
     """)
 
     def save(self, request):
-        self._authorize(request, 'write')
+        self._authorize(request, 'issue')
         payload = request.payload_params() or {}
 
         if not isinstance(payload, dict):
