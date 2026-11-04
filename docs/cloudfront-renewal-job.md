@@ -1,11 +1,8 @@
 # Experimental CloudFront renewal job
 
-This is an **experimental, opt-in connector in the development source tree**,
-not a supported feature of published CertLord 1.2.0. Offline and local integration
-checks pass; actual AWS/IAM and CloudFront edge propagation remain unqualified.
-Live qualification is required before promoting this connector as production
-supported. It does not block merging the experimental implementation or releasing
-other CertLord work. See [qualification gates](cloudfront-qualification.md).
+CertLord 1.3.0 includes an experimental, opt-in connector. Offline and local
+integration checks cover a controlled provider. Live AWS/IAM and CloudFront
+edge propagation still require [qualification](cloudfront-qualification.md).
 
 **Inactive by default:** the daemon does not load or schedule this module. The
 normal installation does not install Boto3; installing the optional `cloudfront`
@@ -55,8 +52,7 @@ does not certify all global edge locations.
 
 ## Explicitly configure an experimental job
 
-Install the **candidate checkout** in an isolated environment (published 1.2.0
-does not contain this module):
+From the 1.3.0 checkout, install the optional SDK in an isolated environment:
 
 ```sh
 python -m pip install '.[cloudfront]'
@@ -195,16 +191,3 @@ separates import acceptance from serving, tests daemon restart without replay,
 and simulates a lost receipt followed by quarantine and explicit reconciliation.
 The simulator's completion is known locally; that property cannot be assumed for
 AWS. No live AWS account, IAM permission or global propagation result is claimed.
-
-The development wheel includes an optional experimental module/SDK extra. This
-integration does not publish a tag, PyPI package or Docker image and does not
-activate the connector in a deployment. Registry descriptions, Compose pins,
-CLI/UI captures, demos and FR/EN websites continue to describe published 1.2.0.
-
-A subsequent CertLord release can include the opt-in experiment alongside other
-changes, provided release notes and affected user-facing surfaces retain the
-experimental status and lack of live qualification. Normal artifact, documentation
-and deployment checks still apply. Only promotion of the AWS connector to
-production-supported status depends on the separate live acceptance record.
-Never overwrite the immutable 1.2.0 artifacts or label local simulation as AWS
-acceptance.

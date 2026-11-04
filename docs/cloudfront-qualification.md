@@ -3,7 +3,7 @@
 The read-only preflight and an [experimental renewal job](cloudfront-renewal-job.md)
 are implemented in the development source tree, with offline and local acceptance.
 Actual AWS account, IAM and CloudFront propagation acceptance remains pending.
-Published CertLord 1.2.0 does not include this writer.
+The optional writer is included starting with CertLord 1.3.0.
 
 The connector is **experimental and inactive by default**. Merging it requires the
 normal regression and local integration checks. Actual AWS acceptance is a gate
@@ -152,9 +152,3 @@ uses synthetic credentials and certificates, so this is never AWS acceptance:
 ```sh
 python tests/integration/cloudfront_sdk_contract.py
 ```
-
-The development wheel includes the optional `certlord.cloudfront` job and
-`cloudfront` SDK extra; default daemon dependencies and configuration are unchanged.
-This integration is not a published release. Registry versions/descriptions,
-Compose, UI captures, demos and product websites remain on stable 1.2.0 until a
-separately versioned delivery; they are not frozen pending AWS qualification.

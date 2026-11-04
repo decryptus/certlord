@@ -9,13 +9,12 @@
 
 TLS certificate lifecycle automation.
 
-Version: **1.2.0**. See the [release notes](docs/release-notes.md).
+Version: **1.3.0**. See the [release notes](docs/release-notes.md).
 
-**Development status:** the source tree also contains an experimental AWS/CloudFront
-renewal job, not included in published 1.2.0. It is inactive by default and requires
-an optional SDK plus an explicitly configured job. Local tests pass; real AWS/IAM
-and CloudFront propagation are not yet qualified. See the
-[contributor qualification guide](docs/cloudfront-qualification.md).
+The optional AWS/CloudFront renewal job is experimental and disabled by default.
+It requires separate SDK installation and job configuration. Verification so far
+covers a controlled provider. Live AWS permissions and edge propagation still
+require qualification.
 
 CertLord automates TLS certificate issuance, renewal and deployment. It supports
 ACME through Certbot and importing existing PEM certificates, stores certificates
@@ -34,7 +33,7 @@ together, or provision them separately for the [Debian installation](docs/debian
 
 Use the [Compose guide](docs/docker-compose.md) for initialization, persistent
 Vault storage, API access and deployment configuration. The application image is
-`decryptus/certlord:1.2.0`.
+`decryptus/certlord:1.3.0`.
 
 ## Command line and terminal interface
 

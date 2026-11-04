@@ -1,4 +1,33 @@
-# CertLord 1.2.0
+# CertLord 1.3.0
+
+ACME callbacks now accept ECDSA keys and validate the certificate, key, DNS name,
+validity dates and supplied chain before writing to Vault. An identical callback
+can be retried after deployment. Certificate routes use the same domain identity
+for case, IDNA labels and a trailing DNS root dot.
+
+## Upgrading from 1.2.0
+
+- Check Certbot DNS plugins and hooks before restarting. Set
+  `modules.ssl_certs.certbot.pass_env` to the extra environment variable names
+  they need. Existing installations with root-owned Certbot accounts and
+  lineages should follow the [migration guide](../MIGRATION.md) before
+  switching to the service account used by the new Debian example.
+- After upgrading every daemon, replace the ACME connector's `write` permission
+  with `issue` and retain `challenge`. Existing writers can still save
+  certificates. See the [connector guide](acme-connector.md).
+- Let active HTTP-01 challenges finish before the upgrade, or republish any
+  challenge originally submitted with a trailing slash.
+- The Debian example listens on `127.0.0.1:8666`. A daemon launched as root
+  resets supplementary groups before changing identity. Startup failures return
+  a nonzero status to the supervisor.
+- Vault HTTPS supports a dedicated `credentials.vault.ca_bundle` and the
+  existing `VAULT_CACERT` environment setting. See the [Vault guide](vault-approle.md).
+
+The optional CloudFront job can renew an existing imported ACM certificate.
+It is disabled by default. Its integration tests use a controlled provider.
+Qualification against live AWS permissions and actual edge propagation is pending.
+
+## CertLord 1.2.0
 
 Independent TLS monitoring checks up to 32 configured web servers, reverse proxies,
 load balancers or CDN endpoints, without issuing or deploying a certificate.
