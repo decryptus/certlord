@@ -1,13 +1,23 @@
 # CertLord roadmap
 
-Updated: 2026-11-05.
+Updated: 2026-11-05. Published stable release: 1.3.1.
 
-## Maintenance release — 1.3.1
+## Delivered — 1.3.1
 
 The issuance worker scans pending Redis records incrementally and guards cleanup
 against concurrent updates. The dependency floors include the HTTPdis request
 handling fixes and Sonicprobe atomic file replacement. See the
 [release notes](docs/release-notes.md) and [Redis ACL upgrade step](MIGRATION.md#redis-permissions-for-131).
+
+The [1.3.1 release](https://github.com/decryptus/certlord/releases/tag/v1.3.1)
+passed the minimum/latest dependency, Debian, lifecycle and two-architecture
+Compose checks. The downloaded PyPI wheel and source archive match the GitHub
+release SHA-256 digests. Docker Hub tags `1.3.1` and `latest` shared manifest
+`sha256:68e9607dc083d2d18b4249abd0d3690e8fbd0ad47a0f330a20bdbb479a73bc0f`
+for Linux amd64 and arm64 at publication. The registry description matched the
+released source. The public [French](https://atraxis.io/certlord-fr.html) and
+[English](https://atraxis.io/certlord.html) installation guides serve the
+versioned Compose command and Redis ACL upgrade step.
 
 ## Delivered — 1.3.0
 
