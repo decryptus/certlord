@@ -2,7 +2,7 @@
 certbot-httpreq==0.0.24
 dnspython==1.16.0
 dwho==0.3.63
-httpdis==0.6.35
+httpdis==0.6.36
 hvac==2.4.0
 pycurl==7.48.0
 pyOpenSSL==26.1.0

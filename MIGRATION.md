@@ -48,6 +48,11 @@ Managed storage paths are documented in the [identity guide](docs/certificate-id
 
 ## API authentication and infrastructure separation
 
+With HTTPdis 0.6.36, the default CertLord HTTP handler denies cross-origin
+browser preflights. Serve a browser frontend and its API under the same
+origin, or explicitly configure the trusted frontend in the reverse proxy.
+Existing CLI clients and direct server-to-server API calls require no CORS setup.
+
 Certificate routes now authenticate through HTTPdis and then check explicit
 `api_authentication.permissions` (`read`, `write`, `deploy`, `challenge`, `issue`).
 An empty permission map denies access. Configure HTTPdis credentials separately
