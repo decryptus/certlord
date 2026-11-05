@@ -4,13 +4,13 @@
 | --- | --- | --- |
 | DWho 0.3.63 | Module lifecycle, Redis adapter and worker integration | One authoritative Redis, one active lifecycle daemon |
 | HTTPdis 0.6.39 | Actual HTTP authentication, parsing and selected JSON error/status contracts | No exhaustive protocol/security conformance claim |
-| Sonicprobe 0.3.56 | Validation, lock behavior and sanitized rejected-value logging | Selected tests do not prove every dependency log is secret-free |
+| Sonicprobe 0.3.63 | Validation, lock behavior and sanitized rejected-value logging | Selected tests do not prove every dependency log is secret-free |
 | Auton/autond 1.2.1 | Real job deployment, failure/recovery, optional matching run/status UID receipts | Default command mode has no confirmed receipt; no remote exactly-once guarantee |
 | Certbot 5.8.0, certbot-httpreq 0.0.24, acme-http-connector 0.2.1 | Real disposable HTTP-01 issuance/renewal and bound save callbacks | RSA 2048 acceptance; no production CA, wildcard, multi-SAN or DNS-01 claim |
 | Vault/HVAC 2.4.0 | KV v2 versioned storage, scoped Token/AppRole, explicit Secret ID replacement, sealed/denied/delayed failures | No host-crash or production backup/restore qualification |
 | Redis | Atomic pending associations, deployment leases and guarded cleanup; 4.5.5 client baseline and 8.1.0 lifecycle client | No failover, cross-store transaction or multi-active issuer guarantee |
 | dnspython 1.16.0 | Existing resolver/CAA interface, fixtures and blocked-call stop/recovery | Pinned legacy API; not a general DNS policy/RFC audit |
-| pyOpenSSL 26.1.0 | PEM/expiry operations exercised in issuance/renewal scenarios | Tested resolver set, not arbitrary future dependency compatibility |
+| pyOpenSSL 26.4.0 | PEM/expiry operations exercised in issuance/renewal scenarios | Tested resolver set, not arbitrary future dependency compatibility |
 | StatusCake 1.4.5 / Updown 0.1.0 | Optional adapters, response/timeout fixtures; local Updown failure/recovery scenario | Live provider APIs remain unvalidated and disabled by default |
 
 Direct floors and exact minimum constraints are in `requirements.txt` and

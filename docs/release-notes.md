@@ -1,4 +1,24 @@
-# CertLord 1.3.0
+# CertLord 1.3.1
+
+The issuance worker now scans pending Redis certificates in batches. Each key is
+processed at most once per cycle, and cleanup preserves entries replenished by
+another writer. The stored keys and certificate format stay compatible.
+
+## Upgrading from 1.3.0
+
+- If you restrict Redis commands with ACLs, grant the worker `SCAN` before
+  restarting CertLord. Keep its existing read, write and script permissions.
+- CertLord now requires HTTPdis 0.6.39 or later for request parsing, handling
+  of Basic credentials and HTTP error details. For a browser frontend hosted
+  on another origin, configure the trusted origin at your reverse proxy.
+- The minimum Sonicprobe version is 0.3.63, which stages temporary file
+  replacements on the destination filesystem. This raises the effective minimum
+  pyOpenSSL version to 26.4.0.
+
+Install `certlord==1.3.1` or pull `decryptus/certlord:1.3.1`.
+See the [migration guide](../MIGRATION.md) before restarting the active daemon.
+
+## CertLord 1.3.0
 
 ACME callbacks now accept ECDSA keys and validate the certificate, key, DNS name,
 validity dates and supplied chain before writing to Vault. An identical callback

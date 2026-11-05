@@ -78,6 +78,13 @@ this is not proactive lease renewal or credential rotation.
 Monitoring remains optional inside CertLord. Set `enabled: true` explicitly to
 initialize a provider. HTTP handlers no longer perform monitoring initialization.
 
+## Redis permissions for 1.3.1
+
+Before upgrading from 1.3.0, allow `SCAN` for the Redis identity used by the
+issuance worker if you use command ACLs. Keep its existing permissions for
+reading and updating pending records and executing cleanup scripts. The
+`cert:*` keys are reused in place.
+
 ## Deployment coordination
 
 Certificate workers now require one authoritative Redis server and a shared

@@ -10,7 +10,7 @@ requires general through DWho. Vault credentials are never API permissions.
 Authorization, finite timeouts, DNS policy and provider-specific validation remain
 with the existing services and adapters.
 
-XYS (Sonicprobe >= 0.3.57) validates parsed Python data; it does not replace the
+XYS (Sonicprobe >= 0.3.63) validates parsed Python data; it does not replace the
 YAML loader, resolve imports, initialize services or grant permissions. Schemas
 are compiled once. These schemas use no modifiers and do not silently convert
 values. The existing numeric normalization and semantic checks still apply.

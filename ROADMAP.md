@@ -1,6 +1,13 @@
 # CertLord roadmap
 
-Updated: 2026-11-04. Published stable release: 1.3.0.
+Updated: 2026-11-05.
+
+## Maintenance release — 1.3.1
+
+The issuance worker scans pending Redis records incrementally and guards cleanup
+against concurrent updates. The dependency floors include the HTTPdis request
+handling fixes and Sonicprobe atomic file replacement. See the
+[release notes](docs/release-notes.md) and [Redis ACL upgrade step](MIGRATION.md#redis-permissions-for-131).
 
 ## Delivered — 1.3.0
 
@@ -12,7 +19,7 @@ and per-service Vault CA configuration. See the [release notes](docs/release-not
 for upgrade steps. [Release #22](https://github.com/decryptus/certlord/pull/22) shipped at tag
 [v1.3.0](https://github.com/decryptus/certlord/releases/tag/v1.3.0). The downloaded
 PyPI wheel and sdist match the GitHub release SHA-256 digests. Docker Hub tags
-1.3.0 and latest share manifest
+At publication, 1.3.0 and latest shared manifest
 `sha256:bb3fd26d1670a49a42a56cecff76624d3727206c0c4b4c493f6ab34e0ea37a09`
 for Linux amd64 and arm64. The registry description matches the tagged source.
 [Website PR #25](https://github.com/decryptus/atraxis-site/pull/25) deployed
