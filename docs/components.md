@@ -3,7 +3,7 @@
 | Component | Current tested contract | Limit |
 | --- | --- | --- |
 | DWho 0.3.63 | Module lifecycle, Redis adapter and worker integration | One authoritative Redis, one active lifecycle daemon |
-| HTTPdis 0.6.37 | Actual HTTP authentication, parsing and selected JSON error/status contracts | No exhaustive protocol/security conformance claim |
+| HTTPdis 0.6.39 | Actual HTTP authentication, parsing and selected JSON error/status contracts | No exhaustive protocol/security conformance claim |
 | Sonicprobe 0.3.56 | Validation, lock behavior and sanitized rejected-value logging | Selected tests do not prove every dependency log is secret-free |
 | Auton/autond 1.2.1 | Real job deployment, failure/recovery, optional matching run/status UID receipts | Default command mode has no confirmed receipt; no remote exactly-once guarantee |
 | Certbot 5.8.0, certbot-httpreq 0.0.24, acme-http-connector 0.2.1 | Real disposable HTTP-01 issuance/renewal and bound save callbacks | RSA 2048 acceptance; no production CA, wildcard, multi-SAN or DNS-01 claim |
