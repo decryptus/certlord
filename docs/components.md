@@ -20,6 +20,13 @@ recorded in their configuration and reports.
 
 ## Preserved integration details
 
+The issuance worker scans `cert:*` with Redis `SCAN` in batches (count hint
+100). It remembers the keys it has seen until the cycle ends, so a repeated
+key is processed once in that cycle. The scan is not a snapshot: work added
+during a cycle can be picked up in the next one. A missing key is skipped.
+An empty record is removed only if its stored value still matches the value
+the worker read. Redis ACLs for this worker must allow `SCAN`.
+
 Redis prefixes `cert:` and `domain:` are retained. New deployments use
 deterministic `deploy:` keys and owner-token `deployment-lock:` leases.
 ACME Redis keys remain the request path. Workers retain their existing module

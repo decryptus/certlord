@@ -14,10 +14,10 @@ from datetime import datetime
 from certlord.ports.certificates import StorageNotFound
 import six
 
+from certlord.adapters.pending import iter_pending_certificates
 from certlord.adapters.issuance_command import issuance_command
 from certlord.adapters.processes import CommandRunner, CommandInterrupted
 from certlord.classes.config import (DEFAULT_COMMAND_TIMEOUT, DEFAULT_PROCESS_STOP_GRACE,
-CERT_KEY_PREFIX,
                                        DEFAULT_CERTBOT_CHECK_INTERVAL,
                                        DEFAULT_DELAY_RESET_RETRIES,
                                        DEFAULT_PROCESSING_DELAY,
@@ -102,14 +102,9 @@ class SslCertsCertbotHandler(threading.Thread):
         self._module.save_acerts(acerts, utc_date = acerts.get_date())
 
     def _run(self):
-        for x in self._redis.keys("%s*" % CERT_KEY_PREFIX)['ssl_certs']:
+        for acerts in iter_pending_certificates(self._redis, self._stop_event.is_set):
             if self.killed:
                 break
-            acerts = self._module.fetch_acerts(key = x)
-            if not acerts.get_certificate_id() or not acerts.has_certs():
-                self._redis.del_key(x)
-                continue
-
             certificate_id = acerts.get_certificate_id()
             curdate = datetime.utcnow()
             reqdate = datetime.strptime(acerts.get_date(), "%Y-%m-%d %H:%M:%S")

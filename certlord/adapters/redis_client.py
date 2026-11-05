@@ -11,6 +11,9 @@ from certlord.classes.config import DEFAULT_REDIS_TIMEOUT
 from certlord.classes.exceptions import CertLordConfigError
 
 
+DELETE_IF_VALUE_MATCHES = "if redis.call('GET', KEYS[1]) == ARGV[1] then return redis.call('DEL', KEYS[1]) end return 0"
+
+
 def redis_adapter(config, prefix):
     adapter = DWhoAdapterRedis(config, load=False)
     for name, conf in config['general']['redis'].items():

@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: GPL-3.0-or-later
 """Redis pending certificates and reverse-certificate_id index."""
 import json
+from certlord.adapters.redis_client import DELETE_IF_VALUE_MATCHES
 from certlord.adapters.operations import operations_snapshot
 from certlord.services.certificate_ids import require_certificate_id
 from datetime import datetime
@@ -29,6 +30,44 @@ redis.call('SET', KEYS[1], result)
 return result"""
 
 
+PENDING_SCAN_COUNT = 100
+
+
+def _pending_object(raw, certificate_id=None):
+    record = (json.loads(raw) if raw else None) or {}
+    return SslCertAutoObject(certificate_id or record['certificate_id'],
+                             record.get('certs'), record.get('date'))
+
+
+def iter_pending_certificates(redis, stopped):
+    """Yield each pending key once per cycle, including across empty SCAN pages."""
+    if len(redis.servers) != 1:
+        raise ValueError('One authoritative Redis server required')
+    connection = next(iter(redis.servers.values()))['conn']
+    cursor = 0
+    seen = set()
+    while not stopped():
+        cursor, keys = connection.scan(cursor=cursor, match=CERT_KEY_PREFIX + '*',
+                                       count=PENDING_SCAN_COUNT)
+        for key in keys:
+            if stopped():
+                return
+            if key in seen:
+                continue
+            seen.add(key)
+            raw = connection.get(key)
+            if raw is None:
+                continue
+            pending = _pending_object(raw)
+            if pending.has_certs():
+                yield pending
+            else:
+                # A writer may have queued fresh work since our GET.
+                connection.eval(DELETE_IF_VALUE_MATCHES, 1, key, raw)
+        if cursor == 0:
+            return
+
+
 class PendingCertificates(object):
     def __init__(self, redis):
         self._redis = redis
@@ -45,14 +84,7 @@ class PendingCertificates(object):
         if not key:
             raise ValueError("unable to fetch certificates.")
 
-        rs = self._redis.get_key(key)
-        if rs:
-            rs = json.loads(rs)
-
-        if not rs:
-            rs = {}
-
-        return SslCertAutoObject(certificate_id or rs['certificate_id'], rs.get('certs'), rs.get('date'))
+        return _pending_object(self._redis.get_key(key), certificate_id)
 
 
     def save_acerts(self, obj, utc_date = None):
