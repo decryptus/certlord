@@ -5,11 +5,11 @@ import hashlib
 import math
 from uuid import uuid4
 
+from certlord.adapters.redis_client import DELETE_IF_VALUE_MATCHES as RELEASE
 from certlord.classes.exceptions import CertLordConfigError
 
 OWNED = "return redis.call('GET', KEYS[1]) == ARGV[1] and 1 or 0"
 RENEW = "if redis.call('GET', KEYS[1]) == ARGV[1] then return redis.call('PEXPIRE', KEYS[1], ARGV[2]) end return 0"
-RELEASE = "if redis.call('GET', KEYS[1]) == ARGV[1] then return redis.call('DEL', KEYS[1]) end return 0"
 ACK = """if redis.call('GET', KEYS[1]) ~= ARGV[1] then return 0 end
 redis.call('SREM', KEYS[2], KEYS[3])
 redis.call('DEL', KEYS[3])
