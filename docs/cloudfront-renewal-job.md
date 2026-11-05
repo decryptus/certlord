@@ -52,7 +52,7 @@ does not certify all global edge locations.
 
 ## Explicitly configure an experimental job
 
-From the 1.3.0 checkout, install the optional SDK in an isolated environment:
+From the 1.3.1 checkout, install the optional SDK in an isolated environment:
 
 ```sh
 python -m pip install '.[cloudfront]'
