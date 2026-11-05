@@ -10,7 +10,7 @@
 | Vault/HVAC 2.4.0 | KV v2 versioned storage, scoped Token/AppRole, explicit Secret ID replacement, sealed/denied/delayed failures | No host-crash or production backup/restore qualification |
 | Redis | Atomic pending associations, deployment leases and guarded cleanup; 4.5.5 client baseline and 8.1.0 lifecycle client | No failover, cross-store transaction or multi-active issuer guarantee |
 | dnspython 1.16.0 | Existing resolver/CAA interface, fixtures and blocked-call stop/recovery | Pinned legacy API; not a general DNS policy/RFC audit |
-| pyOpenSSL 26.1.0 | PEM/expiry operations exercised in issuance/renewal scenarios | Tested resolver set, not arbitrary future dependency compatibility |
+| pyOpenSSL 26.4.0 | PEM/expiry operations exercised in issuance/renewal scenarios | Tested resolver set, not arbitrary future dependency compatibility |
 | StatusCake 1.4.5 / Updown 0.1.0 | Optional adapters, response/timeout fixtures; local Updown failure/recovery scenario | Live provider APIs remain unvalidated and disabled by default |
 
 Direct floors and exact minimum constraints are in `requirements.txt` and

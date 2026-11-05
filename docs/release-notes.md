@@ -12,7 +12,8 @@ another writer. The stored keys and certificate format stay compatible.
   of Basic credentials and HTTP error details. For a browser frontend hosted
   on another origin, configure the trusted origin at your reverse proxy.
 - The minimum Sonicprobe version is 0.3.63, which stages temporary file
-  replacements on the destination filesystem.
+  replacements on the destination filesystem. This raises the effective minimum
+  pyOpenSSL version to 26.4.0.
 
 Install `certlord==1.3.1` or pull `decryptus/certlord:1.3.1`.
 See the [migration guide](../MIGRATION.md) before restarting the active daemon.
