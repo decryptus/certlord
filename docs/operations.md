@@ -29,7 +29,7 @@ All four GET routes require the existing `read` permission and disable caching:
 | Route | Meaning |
 | --- | --- |
 | `/api/health/live` | The authenticated API is responding; no backend probes |
-| `/api/health/ready` | HTTP 200 only after scheduler start, while all three worker threads are alive and Vault listing/Redis ping succeed; otherwise 503 |
+| `/api/health/ready` | HTTP 200 only after scheduler start, while all required worker threads are alive and Vault listing/Redis ping succeed; otherwise 503 |
 | `/api/operations` | Current Redis work plus local and stored worker-cycle evidence as JSON |
 | `/api/operations/metrics` | The same current-work gauges as Prometheus text |
 
@@ -244,3 +244,20 @@ this field, and automatic renewals retain the initiating operation lineage.
 See [operation correlation](operation-correlation.md) for semantics and limits,
 including opt-in confirmed Auton job receipts and the still-open retained
 removal/history audit.
+
+## Orchestrator probe authentication
+
+Authentication on both health routes is intentional. Readiness exposes backend
+and worker state and performs backend calls; keeping it private avoids anonymous
+diagnostic access and anonymous backend probing. This closes review finding #11
+by documented decision, not by introducing a public endpoint.
+
+Provision a dedicated account with only `read`, mount its password as a secret,
+and use an exec probe or an HTTPS-capable probe that supplies Basic credentials.
+Do not place credentials in the manifest, URL or command arguments. Compose uses
+`docker/health.py` and `/etc/certlord/health.yml`, generated for the reader account;
+it sends credentials without printing them or response bodies. Rotate that
+secret with the HTTP authentication file. HTTP 401/403 indicates probe credential
+or permission failure; HTTP 503 indicates not-ready. Use `live` for restart
+policy and `ready` for traffic admission; a dependency outage should not cause an
+unbounded restart loop. No unauthenticated bypass is added to the API.

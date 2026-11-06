@@ -53,7 +53,7 @@ def phase(name):
 
 
 def ready():
-    return requests.get('http://127.0.0.1:8666/api/certificates', timeout=1).status_code == 200
+    return requests.get('http://127.0.0.1:8667/api/certificates', timeout=1).status_code == 200
 
 
 def process():
@@ -119,10 +119,10 @@ def main():
 
     challenge = 'A' * 43
     # Exercise the same public challenge route that must survive service restart.
-    response = requests.put('http://127.0.0.1:8666/.well-known/acme-challenge/' + challenge,
+    response = requests.put('http://127.0.0.1:8667/.well-known/acme-challenge/' + challenge,
                             json=challenge + '.' + 'B' * 43, timeout=5)
     check(response.ok, 'Challenge write failed: HTTP %s' % response.status_code)
-    challenge_url = 'http://127.0.0.1:8666/.well-known/acme-challenge/' + challenge
+    challenge_url = 'http://127.0.0.1:8667/.well-known/acme-challenge/' + challenge
     expected = requests.get(challenge_url, timeout=5)
     check(expected.ok and expected.content, 'Challenge read failed')
 

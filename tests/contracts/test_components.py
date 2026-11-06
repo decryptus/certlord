@@ -141,7 +141,7 @@ class ComponentContracts(unittest.TestCase):
             installer = Installer(SimpleNamespace(test_config=str(config)), 'test')
             installer.prepare()
             installer.deploy_cert('www.example.org', str(cert), str(key), None, None)
-        self.assertEqual(post.call_args.args, ('http://127.0.0.1:8666/api/ssl-certs/save',))
+        self.assertEqual(post.call_args.args, ('http://127.0.0.1:8667/api/ssl-certs/save',))
         payload = post.call_args.kwargs['json']
         self.assertEqual(payload, {'domain': 'www.example.org', 'cert': 'C' * 1200,
                                    'key': 'K' * 1200, 'chain': ''})

@@ -14,7 +14,7 @@ compatibility claim for every dependency version allowed by inherited metadata.
 Copy `etc/certlord/certbot-httpreq.yml.example` to
 `/etc/letsencrypt/certbot-httpreq.yml`, owned by the account running Certbot and
 readable only by that account (mode 0600). This example assumes both processes
-run on the same host and CertLord listens on port 8666. Bind the example
+run on the same host and CertLord listens on port 8667. Bind the example
 CertLord service to loopback before using these unauthenticated local URLs.
 It is not a production exposure policy.
 

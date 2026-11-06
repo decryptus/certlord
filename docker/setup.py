@@ -102,7 +102,7 @@ def initialize(args, client):
         'auton': {'uri': 'http://auton:8080', 'endpoint': 'deploy',
                   'auth-user': 'auton', 'auth-passwd': passwords['auton']}})
     authorization = 'Basic ' + base64.b64encode(('connector:' + passwords['connector']).encode()).decode()
-    connector = {phase: {'uri': 'http://127.0.0.1:8666', 'headers': {'Authorization': authorization}}
+    connector = {phase: {'uri': 'http://127.0.0.1:8667', 'headers': {'Authorization': authorization}}
                  for phase in ('perform', 'cleanup', 'deploy')}
     connector['deploy']['path'] = '/api/ssl-certs/save'
     dump(ROOT / 'certlord/connector.yml', connector)

@@ -20,6 +20,6 @@ COPY docker/ /opt/certlord-docker/
 ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
 USER 10001:10001
 WORKDIR /var/lib/certlord
-EXPOSE 8666
+EXPOSE 8667
 STOPSIGNAL SIGTERM
 CMD ["certlord", "-f", "-c", "/etc/certlord/certlord.yml", "-p", "/var/lib/certlord/certlord.pid", "--logfile", "/var/lib/certlord/certlord.log"]

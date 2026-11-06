@@ -19,7 +19,7 @@ import os
 import requests
 import yaml
 assert os.getuid() == 10001
-base = 'http://127.0.0.1:8666'
+base = 'http://127.0.0.1:8667'
 assert requests.get(base + '/api/certificates', timeout=10).status_code == 401
 with open('/etc/certlord/health.yml') as f:
     reader = yaml.safe_load(f)
