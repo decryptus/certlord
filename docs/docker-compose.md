@@ -37,7 +37,8 @@ probes are ready; it is not proof of successful certificate deployment. See
 [operations](operations.md) and the [certificate API](certificate-identity.md).
 
 The image includes the CLI, Textual browser, Certbot connector and Auton client/
-daemon. It does not embed Redis or Vault inside the application process. The current source defaults to the locally built `certlord:local` image.
+daemon. It does not embed Redis or Vault inside the application process. The
+current source defaults to the locally built `certlord:local` image.
 Use `docker compose up -d --pull never` to avoid pulling a different build.
 
 ## Protect Vault recovery and persistent data
@@ -134,10 +135,11 @@ do not scale the CertLord service. Redis and Auton availability are separate con
 
 ## Updates and logs
 
-The default image is `decryptus/certlord:1.3.1`. Set `CERTLORD_IMAGE` to an explicit
-published version or digest when upgrading. Back up first, review release notes,
-then run `docker compose build` and `docker compose up -d`. Re-running setup does
-not migrate an existing configuration.
+The current source defaults to `certlord:local`. Back up first, follow the
+[port migration steps](../MIGRATION.md#certlord-api-port), then rebuild and restart.
+Set `CERTLORD_IMAGE` only to an image built from this compatible source; the
+published 1.3.1 image requires its own tagged Compose files. Re-running setup
+does not migrate an existing configuration.
 
 Daemon logs are in the `certlord-data` and `auton-data` volumes. For example:
 
