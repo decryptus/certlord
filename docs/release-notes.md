@@ -1,3 +1,26 @@
+# CertLord 1.3.2
+
+New installations use **127.0.0.1:8667**, distinct from Auton on port 8666.
+The CLI default, Certbot connector examples, Docker listener, challenge proxy
+and authenticated readiness probe use the same new port.
+
+## Upgrading from 1.3.1
+
+Existing configuration files are not rewritten. Coordinate the listener, connector,
+clients, reverse proxy and monitoring URLs before restarting. For Compose, migrate
+the mounted configuration to 8667 and use the matching 1.3.2 image and Compose file.
+`CERTLORD_PORT` changes only the loopback host port. To keep a native listener on
+8666, explicitly set `CERTLORD_API_URL` or `--url`. Do not change the Auton URI.
+See [port migration](../MIGRATION.md#certlord-api-port); let active challenges finish
+and preserve credentials and persistent data.
+
+Health routes intentionally remain authenticated. Use a dedicated read-only
+account and mounted probe secrets; see [orchestrator probes](operations.md#orchestrator-probe-authentication).
+Real AWS/CloudFront qualification remains pending. Publication does not upgrade
+existing services automatically.
+
+Install `certlord==1.3.2` or `decryptus/certlord:1.3.2` after publication.
+
 # CertLord 1.3.1
 
 The issuance worker now scans pending Redis certificates in batches. Each key is

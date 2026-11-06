@@ -6,14 +6,14 @@ and the Compose v2 plugin. It is not a high-availability deployment.
 
 ## Download and initialize
 
-This unreleased source uses port 8667 and must be built locally. For published
-1.3.1 images, check out tag `v1.3.1` and use its matching guide and port 8666.
-Keep the Compose file, image and configuration templates from the same version:
+Use the matching 1.3.2 source, image and templates (port 8667).
+For older 1.3.1 images, use tag `v1.3.1` and its port 8666 guide:
 
 ```sh
 git clone https://github.com/decryptus/certlord.git
 cd certlord
-docker compose build
+git checkout v1.3.2
+docker compose pull
 docker compose up -d vault redis
 docker compose run --rm setup init --email you@example.com
 docker compose up -d
@@ -38,8 +38,8 @@ probes are ready; it is not proof of successful certificate deployment. See
 
 The image includes the CLI, Textual browser, Certbot connector and Auton client/
 daemon. It does not embed Redis or Vault inside the application process. The
-current source defaults to the locally built `certlord:local` image.
-Use `docker compose up -d --pull never` to avoid pulling a different build.
+default image is `decryptus/certlord:1.3.2`. To build locally, run
+`docker compose build` before initialization and use `--pull never` at startup.
 
 ## Protect Vault recovery and persistent data
 
@@ -135,11 +135,10 @@ do not scale the CertLord service. Redis and Auton availability are separate con
 
 ## Updates and logs
 
-The current source defaults to `certlord:local`. Back up first, follow the
-[port migration steps](../MIGRATION.md#certlord-api-port), then rebuild and restart.
-Set `CERTLORD_IMAGE` only to an image built from this compatible source; the
-published 1.3.1 image requires its own tagged Compose files. Re-running setup
-does not migrate an existing configuration.
+Back up first and follow the [port migration steps](../MIGRATION.md#certlord-api-port).
+Use `docker compose pull` and restart with the matching 1.3.2 files.
+`CERTLORD_IMAGE` can select a compatible version or digest; 1.3.1 requires its
+own tagged Compose files. Re-running setup does not migrate configuration.
 
 Daemon logs are in the `certlord-data` and `auton-data` volumes. For example:
 
