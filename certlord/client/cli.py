@@ -14,7 +14,7 @@ def parser():
     subparsers = result.add_subparsers(dest='command', required=True)
     for command in COMMANDS:
         sub = subparsers.add_parser(command)
-        sub.add_argument('--url', default=os.environ.get('CERTLORD_API_URL', 'http://127.0.0.1:8666'))
+        sub.add_argument('--url', default=os.environ.get('CERTLORD_API_URL', 'http://127.0.0.1:8667'))
         sub.add_argument('--ca', default=os.environ.get('CERTLORD_API_CA') or True, help='Trusted CA bundle')
         sub.add_argument('--timeout', type=float, default=10)
         if command == 'tui':

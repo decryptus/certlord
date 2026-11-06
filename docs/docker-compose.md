@@ -6,13 +6,14 @@ and the Compose v2 plugin. It is not a high-availability deployment.
 
 ## Download and initialize
 
-Download the repository so the Compose file and its configuration templates stay
-together:
+This unreleased source uses port 8667 and must be built locally. For published
+1.3.1 images, check out tag `v1.3.1` and use its matching guide and port 8666.
+Keep the Compose file, image and configuration templates from the same version:
 
 ```sh
 git clone https://github.com/decryptus/certlord.git
 cd certlord
-docker compose pull
+docker compose build
 docker compose up -d vault redis
 docker compose run --rm setup init --email you@example.com
 docker compose up -d
@@ -25,10 +26,10 @@ It starts with Let's Encrypt **staging**, whose certificates are not browser-tru
 Running initialization again preserves existing configuration and credentials.
 
 Read your operator login locally with `sudo cat .local/admin-login.txt`. The API
-is available only on the host at `http://127.0.0.1:8666`:
+is available only on the host at `http://127.0.0.1:8667`:
 
 ```sh
-curl --user operator http://127.0.0.1:8666/api/health/ready
+curl --user operator http://127.0.0.1:8667/api/health/ready
 ```
 
 Curl prompts for the password. HTTP 200 means the scheduler and required backend
@@ -36,9 +37,9 @@ probes are ready; it is not proof of successful certificate deployment. See
 [operations](operations.md) and the [certificate API](certificate-identity.md).
 
 The image includes the CLI, Textual browser, Certbot connector and Auton client/
-daemon. It does not embed Redis or Vault inside the application process. To build
-the image locally instead of downloading it, use `docker compose build` before
-initialization and `docker compose up -d --pull never` afterwards.
+daemon. It does not embed Redis or Vault inside the application process. The
+current source defaults to the locally built `certlord:local` image.
+Use `docker compose up -d --pull never` to avoid pulling a different build.
 
 ## Protect Vault recovery and persistent data
 
@@ -134,10 +135,11 @@ do not scale the CertLord service. Redis and Auton availability are separate con
 
 ## Updates and logs
 
-The default image is `decryptus/certlord:1.3.1`. Set `CERTLORD_IMAGE` to an explicit
-published version or digest when upgrading. Back up first, review release notes,
-then run `docker compose pull` and `docker compose up -d`. Re-running setup does
-not migrate an existing configuration.
+The current source defaults to `certlord:local`. Back up first, follow the
+[port migration steps](../MIGRATION.md#certlord-api-port), then rebuild and restart.
+Set `CERTLORD_IMAGE` only to an image built from this compatible source; the
+published 1.3.1 image requires its own tagged Compose files. Re-running setup
+does not migrate an existing configuration.
 
 Daemon logs are in the `certlord-data` and `auton-data` volumes. For example:
 

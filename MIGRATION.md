@@ -248,3 +248,18 @@ current settings until you have backed up the Certbot configuration, account and
 lineages, migrated them with their symlinks intact, and verified access to the
 connector configuration and hooks as the service account. Check renewal against
 staging before switching scheduled issuance.
+
+## CertLord API port
+
+New configurations and the CLI now default to **8667**; Auton keeps 8666.
+Existing YAML files are not rewritten. To retain an existing CertLord listener
+on 8666, set `CERTLORD_API_URL=http://127.0.0.1:8666` or pass `--url` explicitly.
+
+To migrate, coordinate `general.listen_port: 8667`, Certbot HTTP connector URLs,
+CLI/TUI URLs, reverse proxy upstreams and monitoring URLs during a maintenance
+window. Let active challenges finish first. Do not change the Auton endpoint.
+For Compose, update the mounted `.local/certlord/certlord.yml` and generated
+connector configuration to 8667 before starting the new image; do not rerun
+bootstrap over existing secrets. The image, internal challenge proxy and health
+check use 8667. `CERTLORD_PORT` overrides only the host-side published port,
+which remains bound to 127.0.0.1. Review local firewall and monitoring rules.

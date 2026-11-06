@@ -50,9 +50,9 @@ The daemon must be able to read credentials but should not be able to rewrite th
 
 Set these deployment-specific values:
 
-- The package example listens on `127.0.0.1:8666`. If Auton already uses this
-  address and port, assign one service a different port and update its clients,
-  connector URLs and reverse proxy accordingly. Route public HTTP-01 challenge
+- The package example listens on `127.0.0.1:8667`. Auton retains port 8666, so both
+  services can run on the same host. For existing installations, follow the
+  [port migration steps](../MIGRATION.md#certlord-api-port). Route public HTTP-01 challenge
   reads through the frontend and use authenticated TLS for remote administration.
 - Set a stable `general.server_id`, the Redis endpoints/databases, and an absolute
   `credentials: /etc/certlord/credentials.yml` path.

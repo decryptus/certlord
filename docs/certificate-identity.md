@@ -62,7 +62,7 @@ authentication. Supply credentials through your protected execution environment,
 not command arguments. These API credentials are independent of Vault credentials.
 TLS verification is always enabled; `CERTLORD_API_CA` or `--ca` selects a CA bundle.
 HTTP is permitted only for loopback endpoints. The default URL is
-`http://127.0.0.1:8666`. `--url` overrides it; `--timeout` sets the positive finite
+`http://127.0.0.1:8667`. `--url` overrides it; `--timeout` sets the positive finite
 connect/read timeout (default 10 seconds, not a whole-command deadline).
 Redirects, implicit netrc credentials and environment proxies are not used.
 

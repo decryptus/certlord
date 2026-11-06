@@ -1,6 +1,6 @@
 name: certlord
 x-image: &image
-  image: ${CERTLORD_IMAGE:-decryptus/certlord:1.3.1}
+  image: ${CERTLORD_IMAGE:-certlord:local}
   build:
     context: .
 services:
@@ -43,7 +43,7 @@ services:
         condition: service_started
       auton:
         condition: service_started
-    ports: ["127.0.0.1:${CERTLORD_PORT:-8666}:8666"]
+    ports: ["127.0.0.1:${CERTLORD_PORT:-8667}:8667"]
     volumes:
       - ./.local/certlord:/etc/certlord:ro
       - certlord-data:/var/lib/certlord
