@@ -1,3 +1,11 @@
+certlord (1.3.2) stable; urgency=medium
+
+  * Use port 8667 for CertLord, distinct from Auton on 8666.
+  * Align CLI, connector, Compose and probe endpoints; document migration.
+  * Document intentional authenticated health checks for orchestrators.
+
+ -- Adrien Delle Cave <pypi@doowan.net>  Fri, 06 Nov 2026 17:40:00 +0100
+
 certlord (1.3.1) stable; urgency=medium
 
   * Scan pending certificates incrementally and guard empty-record cleanup.

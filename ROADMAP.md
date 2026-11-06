@@ -175,12 +175,13 @@ No public or production certificates are required for these synthetic tests.
 These remain separate future capabilities; named destinations alone do not
 implement cloud provisioning, remote fencing or exactly-once execution.
 
-## Implemented — review follow-up (unreleased)
+## Prepared — 1.3.2 review follow-up
 
 New installations and CLI defaults use port 8667, distinct from Auton's 8666.
 Existing installations require the explicit port migration in MIGRATION.md.
 Health endpoints remain authenticated by design, with dedicated read-only probe
 credentials and orchestrator guidance documented in docs/operations.md.
-These changes require validation and a future package/image publication; the
-published 1.3.1 artifacts and public website still describe the previous defaults.
+The correction passed 340 local tests and 32 PR checks. Versioned 1.3.2
+publication and registry/site verification are pending; do not infer publication
+from the source version.
 Live AWS/CloudFront qualification remains pending.
