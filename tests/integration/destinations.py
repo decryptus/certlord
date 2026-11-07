@@ -1,7 +1,5 @@
 """Three real Auton jobs/TLS targets, Vault CAS and Redis queue recovery."""
 import argparse
-import base64
-import hashlib
 import json
 from pathlib import Path
 import ssl
@@ -45,7 +43,7 @@ def install(args):
 
 def exercise(source, directory, stack, env, config, config_path, daemon, vault,
              api, identity, domain, new_material, ca_file, phase):
-    from lifecycle import free_port, write_yaml, start, stop, wait_for, run, http_thread, require, served_fingerprint
+    from lifecycle import free_port, write_yaml, start, stop, wait_for, run, http_thread, require, served_fingerprint, write_bcrypt_passwd
     from cryptography import x509
     from cryptography.hazmat.primitives import hashes
     root = directory / 'destinations'
@@ -58,9 +56,7 @@ def exercise(source, directory, stack, env, config, config_path, daemon, vault,
     job_path.chmod(0o600)
     password = 'disposable-destination-password'
     passwd = root / 'passwd'
-    # Existing legacy Basic support is exercised only inside this loopback fixture.
-    passwd.write_text('fixture:{SHA}' + base64.b64encode(hashlib.sha1(password.encode()).digest()).decode() + '\n')
-    passwd.chmod(0o600)
+    write_bcrypt_passwd(passwd, ('fixture',), password)
     port = free_port()
     origin = 'http://127.0.0.1:' + str(port)
     routes = yaml.safe_load((source / 'tests/integration/auton-routes.yml').read_text())

@@ -9,9 +9,7 @@ in separate bounded subprocesses; this is not a concurrent scheduler/soak test.
 """
 import argparse
 import uuid
-import base64
 import copy
-import hashlib
 import secrets
 from contextlib import ExitStack
 from datetime import datetime, timedelta, timezone
@@ -31,6 +29,7 @@ import tempfile
 import threading
 import time
 
+import bcrypt
 from cryptography import x509
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import ec
@@ -298,16 +297,21 @@ def graceful_stop(process, label, timeout=10):
             label + ': local child survived graceful shutdown')
 
 
+def write_bcrypt_passwd(path, users, password):
+    with path.open('x') as stream:
+        path.chmod(0o600)
+        for user in users:
+            encoded = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode('ascii')
+            stream.write(f'{user}:{encoded}\n')
+
+
 def authenticated_api_checks(config, directory, stack, env, phase, report):
     protected = copy.deepcopy(config)
     port = free_port()
     url = 'http://127.0.0.1:%d' % port
     password = secrets.token_urlsafe(24)
-    # SHA htpasswd is only a disposable legacy Basic fixture, not password-storage guidance.
-    encoded = '{SHA}' + base64.b64encode(hashlib.sha1(password.encode()).digest()).decode()
     passwd = directory / 'fixture.htpasswd'
-    passwd.write_text(''.join(name + ':' + encoded + '\n' for name in ('operator', 'reader', 'denied')))
-    passwd.chmod(0o600)
+    write_bcrypt_passwd(passwd, ('operator', 'reader', 'denied'), password)
     protected['general'].update(listen_port=port, auth_basic='CertLord fixture', auth_basic_file=str(passwd))
     protected['api_authentication'] = {'backend': 'httpdis', 'permissions': {
         'operator': ['read', 'write', 'deploy', 'challenge'], 'reader': ['read']}}
