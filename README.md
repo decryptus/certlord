@@ -9,7 +9,7 @@
 
 TLS certificate lifecycle automation.
 
-Version: **1.3.2**. See the [release notes](docs/release-notes.md).
+Version: **1.3.3**. See the [release notes](docs/release-notes.md).
 
 The optional AWS/CloudFront renewal job is experimental and disabled by default.
 It requires separate SDK installation and job configuration. Verification so far
@@ -33,7 +33,7 @@ together, or provision them separately for the [Debian installation](docs/debian
 
 Use the [Compose guide](docs/docker-compose.md) for initialization, persistent
 Vault storage, API access and deployment configuration. The application image is
-`decryptus/certlord:1.3.2`.
+`decryptus/certlord:1.3.3`.
 
 ## Command line and terminal interface
 

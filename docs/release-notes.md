@@ -1,3 +1,7 @@
+# CertLord 1.3.3
+
+CertLord now requires HTTPdis 0.7.1 or later. With HTTPdis 0.7.1 the default listener backlog is 128. For HTTP Basic authentication, migrate legacy SHA-1 or DES htpasswd entries before upgrading. Use bcrypt on a supported host. The integration suite exercises bcrypt with legacy hashes disabled.
+
 # CertLord 1.3.2
 
 New installations use **127.0.0.1:8667**, distinct from Auton on port 8666.

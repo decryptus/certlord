@@ -6,13 +6,13 @@ and the Compose v2 plugin. It is not a high-availability deployment.
 
 ## Download and initialize
 
-Use the matching 1.3.2 source, image and templates (port 8667).
+Use the matching 1.3.3 source, image and templates (port 8667).
 For older 1.3.1 images, use tag `v1.3.1` and its port 8666 guide:
 
 ```sh
 git clone https://github.com/decryptus/certlord.git
 cd certlord
-git checkout v1.3.2
+git checkout v1.3.3
 docker compose pull
 docker compose up -d vault redis
 docker compose run --rm setup init --email you@example.com
@@ -38,7 +38,7 @@ probes are ready; it is not proof of successful certificate deployment. See
 
 The image includes the CLI, Textual browser, Certbot connector and Auton client/
 daemon. It does not embed Redis or Vault inside the application process. The
-default image is `decryptus/certlord:1.3.2`. To build locally, run
+default image is `decryptus/certlord:1.3.3`. To build locally, run
 `docker compose build` before initialization and use `--pull never` at startup.
 
 ## Protect Vault recovery and persistent data
@@ -136,7 +136,7 @@ do not scale the CertLord service. Redis and Auton availability are separate con
 ## Updates and logs
 
 Back up first and follow the [port migration steps](../MIGRATION.md#certlord-api-port).
-Use `docker compose pull` and restart with the matching 1.3.2 files.
+Use `docker compose pull` and restart with the matching 1.3.3 files.
 `CERTLORD_IMAGE` can select a compatible version or digest; 1.3.1 requires its
 own tagged Compose files. Re-running setup does not migrate configuration.
 
