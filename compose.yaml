@@ -1,6 +1,6 @@
 name: certlord
 x-image: &image
-  image: ${CERTLORD_IMAGE:-decryptus/certlord:1.3.2}
+  image: ${CERTLORD_IMAGE:-decryptus/certlord:1.3.3}
   build:
     context: .
 services:

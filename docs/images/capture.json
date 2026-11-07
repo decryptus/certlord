@@ -1,6 +1,6 @@
 {
   "data": "synthetic read-only HTTP fixture; not lifecycle evidence",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "dwho": "0.3.66",
   "columns": 100,
   "rows": 16
