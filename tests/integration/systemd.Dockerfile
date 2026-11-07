@@ -10,7 +10,7 @@ STOPSIGNAL SIGRTMIN+3
 CMD ["/sbin/init"]
 
 FROM service AS lifecycle
-RUN /opt/venvs/certlord/bin/python -m pip install autond==1.2.1
+RUN /opt/venvs/certlord/bin/python -m pip install autond==1.2.1 bcrypt==5.0.0
 COPY tools/ /fixture/tools/
 COPY lifecycle.py diagnostics.py network_faults.py systemd_process.py auton-routes.yml /fixture/
 COPY source/etc/ /fixture/source/etc/

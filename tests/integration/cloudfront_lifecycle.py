@@ -1,6 +1,5 @@
 """Real Vault/AppRole, Redis, Auton and TLS; controlled HTTP provider, NEVER AWS."""
 import argparse
-import base64
 import hashlib
 import json
 from pathlib import Path
@@ -57,7 +56,7 @@ def job(args):
 
 def exercise(source, directory, stack, env, config, config_path, daemon, vault,
              api, identity, domain, replacement_material, ca_file, phase):
-    from lifecycle import free_port, write_yaml, start, stop, wait_for, run, http_thread, require, served_fingerprint
+    from lifecycle import free_port, write_yaml, start, stop, wait_for, run, http_thread, require, served_fingerprint, write_bcrypt_passwd
     root = directory / 'cloudfront'
     root.mkdir(mode=0o700)
     state = root / 'state'; state.mkdir(mode=0o700)
@@ -135,8 +134,7 @@ def exercise(source, directory, stack, env, config, config_path, daemon, vault,
     fixture.chmod(0o600)
     password = 'disposable-cloudfront-password'
     passwd = root / 'passwd'
-    passwd.write_text('fixture:{SHA}' + base64.b64encode(hashlib.sha1(password.encode()).digest()).decode() + '\n')
-    passwd.chmod(0o600)
+    write_bcrypt_passwd(passwd, ('fixture',), password)
     port = free_port(); origin = 'http://127.0.0.1:' + str(port)
     routes = yaml.safe_load((source / 'tests/integration/auton-routes.yml').read_text())
     for module in routes.values():
