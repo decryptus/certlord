@@ -1,3 +1,8 @@
+# CertLord 1.3.4
+
+Requires Sonicprobe 0.3.66 for missing Date and Message-ID headers in shared
+mail helpers. Rebuild/update the package or image and restart the service.
+
 # CertLord 1.3.3
 
 CertLord now requires HTTPdis 0.7.1 or later. With HTTPdis 0.7.1 the default listener backlog is 128. For HTTP Basic authentication, migrate legacy SHA-1 or DES htpasswd entries before upgrading. Use bcrypt on a supported host. The integration suite exercises bcrypt with legacy hashes disabled.
