@@ -1,10 +1,10 @@
-FROM python:3.12-slim-bookworm AS build
+FROM python:3.15-slim-bookworm AS build
 RUN apt-get update && apt-get install -y --no-install-recommends build-essential libcurl4-openssl-dev libssl-dev && rm -rf /var/lib/apt/lists/*
 WORKDIR /src
 COPY . .
 RUN python -m pip wheel --wheel-dir /wheels '.[textual]' 'certbot==5.8.0' 'certbot-httpreq==0.0.25' 'acme-http-connector==0.2.2' 'auton==1.3.7' 'autond==1.3.7'
 
-FROM python:3.12-slim-bookworm
+FROM python:3.15-slim-bookworm
 ARG VERSION=1.3.4
 LABEL org.opencontainers.image.title="CertLord" \
       org.opencontainers.image.description="TLS certificate lifecycle automation with ACME, Vault storage and Auton deployment." \
