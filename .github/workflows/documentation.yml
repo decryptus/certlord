@@ -30,7 +30,7 @@ jobs:
           for file in docs/images/*.txt docs/images/capture.json; do
             diff -u "$file" "/tmp/certlord-captures/$(basename "$file")"
           done
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: certlord-documentation-captures
           path: /tmp/certlord-captures

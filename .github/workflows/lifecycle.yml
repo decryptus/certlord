@@ -31,7 +31,7 @@ jobs:
           --report "$RUNNER_TEMP/certlord-evidence/report.json"
       - name: Retain only sanitized test evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: certlord-lifecycle-${{ github.run_attempt }}
           path: ${{ runner.temp }}/certlord-evidence/report.json

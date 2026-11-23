@@ -25,7 +25,7 @@ jobs:
       - run: python .github/scripts/check-test-collection.py --runner unittest textual_tests
       - run: python -m unittest discover -s textual_tests -v
       - run: python scripts/capture_textual.py --output /tmp/textual-captures --png
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: textual-captures
           path: /tmp/textual-captures
