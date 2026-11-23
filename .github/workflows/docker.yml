@@ -32,7 +32,7 @@ jobs:
     env:
       CERTLORD_IMAGE: certlord-compose-test:local
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - name: Validate Compose and build image
         run: |
           docker compose config --quiet
@@ -58,20 +58,20 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - name: Validate stable image version
         id: version
         run: |
           version=$(cat VERSION)
           python -c 'import re; from pathlib import Path; assert re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+", Path("VERSION").read_text().strip())'
           echo "version=$version" >> "$GITHUB_OUTPUT"
-      - uses: docker/setup-qemu-action@v3
-      - uses: docker/setup-buildx-action@v3
-      - uses: docker/login-action@v3
+      - uses: docker/setup-qemu-action@v4
+      - uses: docker/setup-buildx-action@v4
+      - uses: docker/login-action@v4
         with:
           username: decryptus
           password: ${{ secrets.DOCKERHUB_TOKEN }}
-      - uses: docker/build-push-action@v6
+      - uses: docker/build-push-action@v7
         with:
           context: .
           platforms: linux/amd64,linux/arm64
@@ -89,7 +89,7 @@ jobs:
           Path('/tmp/certlord-dockerhub.md').write_text(text)
           PY
       - name: Synchronize Docker Hub description
-        uses: peter-evans/dockerhub-description@432a30c9e07499fd01da9f8a49f0faf9e0ca5b77 # v4
+        uses: peter-evans/dockerhub-description@1b9a80c056b620d92cedb9d9b5a223409c68ddfa # v5.0.0
         with:
           username: decryptus
           password: ${{ secrets.DOCKERHUB_TOKEN }}
