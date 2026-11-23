@@ -12,4 +12,4 @@ six==1.17.0
 sonicprobe==0.3.66
 statuscake==1.4.5
 updownio==0.1.0
-redis==4.5.5
+redis==8.1.0
