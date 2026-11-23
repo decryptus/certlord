@@ -28,7 +28,7 @@ account and mounted probe secrets; see [orchestrator probes](operations.md#orche
 Real AWS/CloudFront qualification remains pending. Publication does not upgrade
 existing services automatically.
 
-Install `certlord==1.3.2` or `decryptus/certlord:1.3.2` after publication.
+Install `certlord==1.3.2` or `decryptus/certlord:1.3.2`.
 
 # CertLord 1.3.1
 

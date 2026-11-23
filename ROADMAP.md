@@ -1,6 +1,24 @@
 # CertLord roadmap
 
-Updated: 2026-11-05. Published stable release: 1.3.1.
+Updated: 2026-11-23. Published stable release: 1.3.4.
+
+## Delivered — 1.3.2 to 1.3.4
+
+- **1.3.2** ([release](https://github.com/decryptus/certlord/releases/tag/v1.3.2),
+  2026-11-06): new installations and CLI defaults use port 8667, distinct from
+  Auton's 8666. Existing installations require the explicit port migration in
+  MIGRATION.md. Health endpoints remain authenticated by design, with dedicated
+  read-only probe credentials documented in docs/operations.md.
+- **1.3.3** ([release](https://github.com/decryptus/certlord/releases/tag/v1.3.3),
+  2026-11-07): requires HTTPdis 0.7.1 or later.
+- **1.3.4** ([release](https://github.com/decryptus/certlord/releases/tag/v1.3.4),
+  2026-11-21): requires Sonicprobe 0.3.66 for missing outgoing Date and
+  Message-ID mail headers.
+
+All three versions are published on PyPI with GitHub releases; see the
+[release notes](docs/release-notes.md). The public Atraxis installation guides
+still referenced 1.3.3 on 2026-11-23 and need to follow 1.3.4.
+Live AWS/CloudFront qualification remains pending.
 
 ## Delivered — 1.3.1
 
@@ -174,14 +192,3 @@ No public or production certificates are required for these synthetic tests.
 
 These remain separate future capabilities; named destinations alone do not
 implement cloud provisioning, remote fencing or exactly-once execution.
-
-## Prepared — 1.3.2 review follow-up
-
-New installations and CLI defaults use port 8667, distinct from Auton's 8666.
-Existing installations require the explicit port migration in MIGRATION.md.
-Health endpoints remain authenticated by design, with dedicated read-only probe
-credentials and orchestrator guidance documented in docs/operations.md.
-The correction passed 340 local tests and 32 PR checks. Versioned 1.3.2
-publication and registry/site verification are pending; do not infer publication
-from the source version.
-Live AWS/CloudFront qualification remains pending.
