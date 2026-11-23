@@ -15,7 +15,7 @@ jobs:
         run: |
           apt-get update -qq
           apt-get install -y --no-install-recommends ca-certificates git build-essential debhelper dh-virtualenv python3 python3-venv python3-dev python3-setuptools python3-yaml libcurl4-openssl-dev libssl-dev
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - name: Build Debian package with isolated dependencies
         run: |
           dpkg-buildpackage -us -uc -b
@@ -52,7 +52,7 @@ jobs:
           dpkg --remove certlord
           test -f /var/lib/certlord/retained-fixture
           test ! -e /usr/bin/certlord
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: certlord-debian12-amd64
           path: deb-artifacts/*.deb
@@ -64,7 +64,7 @@ jobs:
     timeout-minutes: 10
     container: debian:12
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: certlord-debian12-amd64
           path: /tmp/certlord-package
@@ -86,8 +86,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 12
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/download-artifact@v8
         with:
           name: certlord-debian12-amd64
           path: tests/integration/package
@@ -106,7 +106,7 @@ jobs:
           docker exec certlord-systemd /opt/venvs/certlord/bin/python /fixture/systemd_acceptance.py
       - name: Retain sanitized systemd evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: certlord-systemd-${{ github.run_attempt }}
           path: ${{ runner.temp }}/systemd-evidence/systemd.json
@@ -123,8 +123,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
-      - uses: actions/download-artifact@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/download-artifact@v8
         with:
           name: certlord-debian12-amd64
           path: tests/integration/package
@@ -144,7 +144,7 @@ jobs:
           docker exec -e CERTLORD_DISPOSABLE_SYSTEMD=1 -e PATH=/opt/venvs/certlord/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin certlord-systemd-lifecycle /opt/venvs/certlord/bin/python /fixture/lifecycle.py run --systemd-scheduler --tools /fixture/tools --source /fixture/source --report /evidence/report.json
       - name: Retain sanitized systemd lifecycle evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: certlord-systemd-lifecycle-${{ github.run_attempt }}
           path: ${{ runner.temp }}/systemd-lifecycle-evidence/report.json
