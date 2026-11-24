@@ -1,6 +1,6 @@
 # Tested direct-dependency baseline; transitive dependencies remain resolved by pip.
 certbot-httpreq==0.0.24
-dnspython==1.16.0
+dnspython==2.9.2
 dwho==0.3.69
 httpdis==0.7.1
 hvac==2.4.0

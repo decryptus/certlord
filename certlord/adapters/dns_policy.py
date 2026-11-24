@@ -60,7 +60,7 @@ class DnsPolicy(object):
         remaining = deadline - time.monotonic()
         if remaining <= 0:
             raise dns.exception.Timeout()
-        return self.resolver.query(rname, rtype, lifetime=remaining)
+        return self.resolver.resolve(rname, rtype, lifetime=remaining, search=True)
 
     def check_dns_resolv(self, rname):
         if not self._allow_dns_resolv:

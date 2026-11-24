@@ -9,7 +9,7 @@
 | Certbot 5.8.0, certbot-httpreq 0.0.24, acme-http-connector 0.2.1 | Real disposable HTTP-01 issuance/renewal and bound save callbacks | RSA 2048 acceptance; no production CA, wildcard, multi-SAN or DNS-01 claim |
 | Vault/HVAC 2.4.0 | KV v2 versioned storage, scoped Token/AppRole, explicit Secret ID replacement, sealed/denied/delayed failures | No host-crash or production backup/restore qualification |
 | Redis | Atomic pending associations, deployment leases and guarded cleanup; 4.5.5 client baseline and 8.1.0 lifecycle client | No failover, cross-store transaction or multi-active issuer guarantee |
-| dnspython 1.16.0 | Existing resolver/CAA interface, fixtures and blocked-call stop/recovery | Pinned legacy API; not a general DNS policy/RFC audit |
+| dnspython 2.9.2 | Existing resolver/CAA interface through `Resolver.resolve()` with the search list kept, fixtures and blocked-call stop/recovery | Not a general DNS policy/RFC audit |
 | pyOpenSSL 26.4.0 | PEM/expiry operations exercised in issuance/renewal scenarios | Tested resolver set, not arbitrary future dependency compatibility |
 | StatusCake 1.4.5 / Updown 0.1.0 | Optional adapters, response/timeout fixtures; local Updown failure/recovery scenario | Live provider APIs remain unvalidated and disabled by default |
 
@@ -49,7 +49,7 @@ rotation and live monitoring APIs remain separate gates. Locks for other
 certificate operations are still process-local; deployment leases do not fence
 remote Auton effects. Optional monitoring remains disabled by default; StatusCake
 registration is disabled. DNS authorization must be configured explicitly if
-required, and its dnspython migration remains open.
+required; it uses the dnspython 2 resolver API (minimum 2.9.2).
 
 
 ## Current issuance and storage protocol (2026-10-02)

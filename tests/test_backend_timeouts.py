@@ -18,17 +18,17 @@ from certlord.services.certificates import CertificateService, CertificateBusy
 class BackendTimeoutTests(unittest.TestCase):
     def test_dns_failure_is_not_absent_caa(self):
         resolver = Mock()
-        resolver.query.side_effect = dns.resolver.NoNameservers()
+        resolver.resolve.side_effect = dns.resolver.NoNameservers()
         policy = DnsPolicy({'expected_caa_records': [None]}, resolver)
         with self.assertRaises(dns.resolver.NoNameservers):
             policy.check_caa_records('a.example.test')
-        self.assertEqual(resolver.query.call_count, 1)
+        self.assertEqual(resolver.resolve.call_count, 1)
 
     def test_caa_absence_still_uses_parent_and_policy(self):
         resolver = Mock()
-        resolver.query.side_effect = dns.resolver.NoAnswer()
+        resolver.resolve.side_effect = dns.resolver.NoAnswer()
         self.assertTrue(DnsPolicy({'expected_caa_records': [None]}, resolver).check_caa_records('a.test'))
-        self.assertEqual(resolver.query.call_count, 2)
+        self.assertEqual(resolver.resolve.call_count, 2)
         self.assertFalse(DnsPolicy({'expected_caa_records': ['issuer']}, resolver).check_caa_records('a.test'))
 
     def test_caa_ancestors_share_budget(self):
@@ -36,11 +36,11 @@ class BackendTimeoutTests(unittest.TestCase):
         def missing(*args, **kwargs):
             time.sleep(0.06)
             raise dns.resolver.NoAnswer()
-        resolver.query.side_effect = missing
+        resolver.resolve.side_effect = missing
         policy = DnsPolicy({'dns_timeout': 0.04, 'expected_caa_records': [None]}, resolver)
         with self.assertRaises(dns.exception.Timeout):
             policy.check_caa_records('a.b.example.test')
-        self.assertEqual(resolver.query.call_count, 1)
+        self.assertEqual(resolver.resolve.call_count, 1)
 
     def test_dns_backend_error_is_sanitized_and_retryable(self):
         backend = Mock()
