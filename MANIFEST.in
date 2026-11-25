@@ -1,40 +1,14 @@
-include README.md MIGRATION.md CHANGELOG VERSION RELEASE LICENSE
-include requirements.txt constraints-minimum.txt setup.yml setup.yml.j2
-include CONTRIBUTING.md AGENTS.md
-recursive-include tests *.py *.yml *.Dockerfile *.service
+include README.md LICENSE VERSION RELEASE requirements.txt setup.yml
 recursive-include etc *
-recursive-include debian *
-recursive-include .github *.py *.sh *.yml
-include docs/acme-connector.md
-include docs/architecture.md
-include docs/certificate-identity.md
-include docs/certificate-import.md
-include docs/components.md
-include docs/debian-installation.md
-include docs/operation-correlation.md
-include docs/operations.md
-include docs/supervision.md
-include docs/testing.md
-include docs/tls-verification.md
-include docs/multi-destination.md
-include docs/vault-approle.md
-recursive-include assets/brand *.svg *.png *.ico *.webmanifest *.md
-include scripts/build_brand_assets.py
-include docs/release-notes.md
-include docs/screenshots.md docs/rc-evaluation.md
-recursive-include docs/images *.png *.txt *.json
-include scripts/capture_docs.py scripts/requirements-docs.txt
-include scripts/destination-demo.json scripts/tls-demo.json
-include DOCKERHUB.md
 
-include docs/textual.md
-recursive-include textual_tests *.py
-include scripts/capture_textual.py
-
-# Ship both complete documentation entry points in the source archive.
-include conf.py index.rst docs/requirements.txt
-recursive-include _templates *.html
-recursive-include docs *.md *.rst
-
-include Dockerfile .dockerignore compose.yaml
-recursive-include docker *.py *.sh *.hcl *.conf *.yml
+# Repository and maintainer material never ships in the source distribution.
+prune tests
+prune textual_tests
+prune docs
+prune scripts
+prune .github
+prune debian
+prune docker
+global-exclude __pycache__ *.py[cod]
+prune assets
+prune _templates
