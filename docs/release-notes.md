@@ -1,3 +1,10 @@
+# CertLord 1.3.5
+
+Packaging-only release, with no change to CertLord's behavior or configuration.
+The source distribution and GitHub release archives now contain only what is
+needed to build, install and run CertLord: repository, test and maintainer
+files are no longer included. Upgrading is optional.
+
 # CertLord 1.3.4
 
 Requires Sonicprobe 0.3.66 for missing Date and Message-ID headers in shared
