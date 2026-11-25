@@ -18,7 +18,7 @@ Updated: 2026-11-25. Published stable release: 1.3.5.
   2026-11-25): packaging-only release; the sdist and GitHub source archives no
   longer ship repository, test or maintainer files. No functional change.
 
-All four versions are published on PyPI with GitHub releases and Docker images; see the
+All four versions are published on PyPI with GitHub releases; see the
 [release notes](docs/release-notes.md). The public Atraxis installation guides
 still referenced 1.3.3 on 2026-11-23 and need to follow 1.3.5; atraxis.io shows 1.3.5.
 Live AWS/CloudFront qualification remains pending.
