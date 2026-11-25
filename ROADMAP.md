@@ -1,8 +1,8 @@
 # CertLord roadmap
 
-Updated: 2026-11-23. Published stable release: 1.3.4.
+Updated: 2026-11-25. Published stable release: 1.3.5.
 
-## Delivered — 1.3.2 to 1.3.4
+## Delivered — 1.3.2 to 1.3.5
 
 - **1.3.2** ([release](https://github.com/decryptus/certlord/releases/tag/v1.3.2),
   2026-11-06): new installations and CLI defaults use port 8667, distinct from
@@ -14,10 +14,13 @@ Updated: 2026-11-23. Published stable release: 1.3.4.
 - **1.3.4** ([release](https://github.com/decryptus/certlord/releases/tag/v1.3.4),
   2026-11-21): requires Sonicprobe 0.3.66 for missing outgoing Date and
   Message-ID mail headers.
+- **1.3.5** ([release](https://github.com/decryptus/certlord/releases/tag/v1.3.5),
+  2026-11-25): packaging-only release; the sdist and GitHub source archives no
+  longer ship repository, test or maintainer files. No functional change.
 
-All three versions are published on PyPI with GitHub releases; see the
+All four versions are published on PyPI with GitHub releases and Docker images; see the
 [release notes](docs/release-notes.md). The public Atraxis installation guides
-still referenced 1.3.3 on 2026-11-23 and need to follow 1.3.4.
+still referenced 1.3.3 on 2026-11-23 and need to follow 1.3.5; atraxis.io shows 1.3.5.
 Live AWS/CloudFront qualification remains pending.
 
 ## Delivered — 1.3.1
