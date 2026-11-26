@@ -130,7 +130,7 @@ they must not be used to initialize or manage your existing cluster.
 
 A Vault HA cluster requires independent hosts, Raft quorum, a resilient endpoint
 and an unseal strategy. Three local containers do not protect against host failure.
-CertLord 1.3.1 still supports **one active lifecycle daemon** per state scope;
+CertLord 1.3.5 still supports **one active lifecycle daemon** per state scope;
 do not scale the CertLord service. Redis and Auton availability are separate concerns.
 
 ## Updates and logs
