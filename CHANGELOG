@@ -1,3 +1,10 @@
+certlord (1.3.5) stable; urgency=low
+
+  * Ship only build and runtime files in the source distribution.
+  * Keep repository material out of GitHub source archives.
+
+ -- Adrien Delle Cave <pypi@doowan.net>  Wed, 25 Nov 2026 22:20:00 +0100
+
 certlord (1.3.4) unstable; urgency=medium
 
   * Require Sonicprobe 0.3.66 for missing outgoing Date and Message-ID headers.
